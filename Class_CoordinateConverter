@@ -1,0 +1,48 @@
+class CoordinateConverter:
+    def __init__(self, offset_earth=360, offset_screen=600):
+        """
+        Initializes a coordinate converter to transform geographic coordinates into
+        Canvas coordinates.
+
+        Args:
+            offset_earth (float): Size of the geographic region you are mapping (typically 360 for whole world longitude)
+            offset_screen (float): Size (in pixels) you want that area to appear on screen
+        """
+        self.offset_earth = offset_earth
+        self.offset_screen = offset_screen
+
+    def geo_to_canvas(self, lat, lon, l_canvas, h_canvas):
+        """
+        Converts (latitude, longitude) of a point on Earth into Canvas coordinates.
+
+        Parameters
+        ----------
+        lat : float
+            Latitude of a point on Earth.
+        lon : float
+            Longitude of a point on Earth.
+        l_canvas : int
+            Width of the Canvas.
+        h_canvas : int
+            Height of the Canvas.
+
+        Returns
+        -------
+        x : float
+            X coordinate on the canvas.
+        y : float
+            Y coordinate on the canvas.
+        """
+
+        # Map longitude [-180,180] → [0, l_canvas]
+        x = (lon + 180) * (l_canvas / 360)
+
+        # Map latitude [-90,90] → [h_canvas, 0] (inverted y-axis for Canvas)
+        y = (90 - lat) * (h_canvas / 180)
+
+        # Apply scaling factor (optional, but you wanted it)
+        scale_factor = self.offset_screen / self.offset_earth
+        x *= scale_factor
+        y *= scale_factor
+
+        return x, y
