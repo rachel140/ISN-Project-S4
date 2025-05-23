@@ -2,28 +2,23 @@ import csv
 
 class SeaLevel:
     def __init__(self):
-        self.dico_sea_level = {}
+        self.dico_sea_level_past = {}
         self.load_data_sea_level("Sea_level_rise.csv")
 
     def load_data_sea_level(self, file_sea_level, delimiteur = ';', jump_first_line = True):
-        #dico_sea_level = {}
+        dico_sea_level = {}
         with open(file_sea_level, 'r', encoding = 'utf-8') as our_data:
             csvReader = csv.reader(our_data, delimiter = delimiteur)
             if jump_first_line:
                 next(csvReader)
             for row in csvReader:
-                if int(row[0]) % 5 == 0:
+                if int(row[0]) % 5 == 0:   #Keep only the values every five years
                     self.dico_sea_level[int(row[0])]= float(row[1])
-        # dico_sea_level_1 = dico_sea_level
-        # dico_sea_level_2 = dico_sea_level
-        # dico_sea_level_3 = dico_sea_level
-        # dico_sea_level_4 = dico_sea_level
-
-        # list_dicts = [dico_sea_level_1, dico_sea_level_2, dico_sea_level_3, dico_sea_level_4]
-        # for i in range(len(list_dicts)):
-        #     self.dico_sea_level[i+1] = list_dicts[i]
+       
+        
 
         return self.dico_sea_level
+
 
 
     def compute_sea_level_1(self, year):
@@ -39,11 +34,9 @@ class SeaLevel:
         return round(3*(10**(-128))*year**38.388,3)
 
     def retrieve_sea_level(self, year, scenario):
-        if year in self.dico_sea_level.keys():
+        if year in self.dico_sea_level_past.keys():
             sea_level = self.dico_sea_level[year]
-        # if year in self.dico_sea_level[scenario].keys():
-        #     sea_level = self.dico_sea_level[scenario][year]
-
+       
         elif scenario == 1:
             sea_level = self.compute_sea_level_1(year)
             #self.dico_sea_level[scenario][year] = sea_level
