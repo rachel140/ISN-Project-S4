@@ -1,0 +1,123 @@
+import csv
+import netCDF4 as nc
+
+
+class ElevationData:
+
+    def __init__(self, file_name):
+
+       self.netcdf_files  = file_name
+       self.elevation_dict = {} # Initialize an empty dictionary: { elevation → [[lat, lon], ...] }
+       self.create_elevation()
+
+    def create_elevation(self):
+
+        """
+        Load the data from several nc files containing the elevation, longitude and altitude of all points on Earth (with a precision to the 15 arc-minute). Convert the data to create a dictionary with the key being an elevation and the value a list of tuples (latitude, longitude), in degrees, of all points being at the given elevation (in meters).
+
+        elevation_dico = { “elevation1” : [ [lat1, long1], [lat2, long2], …],
+                          evation2” : [ [lat1, long1], [lat2, long2], …],
+                          ,
+                          }
+        Parameters:
+            -------
+            files_name: list of strings
+            corresponding to the name of the nc files containing the data for the latitude, longitude and elevation of all points on Earth.
+
+        Returns:
+            -------
+            elevation_dico: dict
+            associates each elevation in meters to a list of tuples (latitude, longitude) in degrees at the given elevation.
+        """
+
+        # Read the NetCDF file
+        with nc.Dataset(self.netcdf_files, mode='r') as dataset:
+            # Read the latitude and longitude arrays of the NetCDF file
+            lats = dataset.variables['lat'][:]
+            lons = dataset.variables['lon'][:]
+
+            # Read the elevation matrix (2D array: lat x lon)
+            elevations = dataset.variables['z'][:]
+
+
+            # Define the step of the array to have a 0.5° resolution
+            # Convert the 15 arc-minute resolution :
+            # Given that 1°= 60 arc-minute, 0.5° = 30 arc-mintues
+            # So keep every 2nd point
+            step = 10
+
+            # Get indices that will give us data at 0.5° spacing
+            lat_indices = list(range(0, len(lats), step))
+            lon_indices = list(range(0, len(lons), step))
+
+            # Loop through selected lat/lon lists
+            for i in lat_indices:
+                for j in lon_indices:
+                    lat = float(lats[i])
+                    lon = float(lons[j])
+                    elev = float(elevations[i, j])
+
+                    # Initialize list for this elevation if it doesn't exist
+                    if elev not in self.elevation_dict:
+                        self.elevation_dict[elev] = []
+
+                        # Add the coordinate pair [lat, lon] to the elevation_dict dictionary at index elevation (elev)
+                        self.elevation_dict[elev].append([lat, lon])
+
+    def build_dico_visible_points (self):
+        """
+        Go through each point of the dictionary corresponding to the country clicked and test if the elevation of the point is superior to the ocean’s elevation. If not, we don’t take the point into account,
+        If so, the point will be stored in the new dictionary, containing only points that aren’t submerged.
+
+        Parameters :
+            -------
+            controller: Controller
+
+        Returns :
+            -------
+            new_country : dict
+            Of the form: { point _2= [lat2, long2, elev2]..  : dict
+
+        """
+        new_country = {}
+        if self.controller.find_country() == 'Brazil':
+
+            dico_country = self.dico_Brazil
+            for i in range(len(dico_country)):
+                new_country[i] = dico_country[i]
+
+    # def build_dico_per_long (new_country) :
+    #     """
+    #     This functions computes the average of all the elevations for each longitude of the country
+
+    #     Parameters :
+    #         -------
+    #         new_country: dict
+
+    #     Returns :
+    #     -------
+    #     country_per_long: dict
+    #     Of the form { long : average_lat …}
+    #     """
+
+    #     #  new_country = { point _2= [lat2, long2, elev2]..  : dict
+
+    #     dico_per_long = {}
+    #     for i in new_country :
+    #         longitude = new_country.[i][1]
+    #         elevation = new_country.[i][2]
+    #         if longitude in dico_per_long :
+    #             dico_per_long[longitude].append(elevation)
+    #         else :
+    #             dico_per_long[longitude]=[elevation]
+    #     for j in dico_per_long.values :
+    #         average = (sum(j)/(len(j))
+    #         dico_per_long[i]=average
+    #     return dico_per_long
+
+
+file_name = 'ETOPO_2022_v1_60s_N90W180_bed.nc'
+file_france = 'fr_with_elevation.csv'
+file_java = 'id.json'
+file_bazil = 'geoBoundaries-BRA-ADM0_simplified.geojson'
+dict_sea = ElevationData(file_name)
