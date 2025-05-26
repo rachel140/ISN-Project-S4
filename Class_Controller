@@ -14,6 +14,7 @@ class Controller:
         self.coordinate_converter = CoordinateConverter()
 
     def get_sea_level(self, scenario):
+        self.scenraio = self.main_view.get_ipcc_value()
         self.year = self.main_view.get_user_year()
         self.sea_level_value = self.sea_level.retrieve_sea_level(self.year, scenario)
         return self.sea_level_value
