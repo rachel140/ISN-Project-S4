@@ -1,204 +1,199 @@
 import datetime
-import tkinter as tk
+import customtkinter as ctk
 
-from Class_SecondaryView import SecondaryView
 from Class_Controller import Controller
+from Class_SecondaryView import SecondaryView
+from Class_Coordinate_Converter import CoordinateConverter
 
-class MainView(tk.Tk):
 
+class MainView(ctk.CTk):
     def __init__(self):
         super().__init__()
         self.title("Map")
+        self.geometry("900x600")
 
-        # so the scale automatically gets placed on this year
         current_year = datetime.datetime.now().year
         self.rounded_year = min(2500, max(2000, 5 * round(current_year / 5)))
 
-        self.secondary_view = SecondaryView()
         self.controller = Controller()
+        self.secondary_view = SecondaryView()
+        self.coordinate_converter = CoordinateConverter()
         self.create_widget()
 
-        #self.click_coordinates = [] # List to store click coordinates
+        self.controller.set_views(self, self.secondary_view)
 
     def create_widget(self):
-        #colourcodes so that we do not need to change the colours everywhere
-        bottom_bar = "lightblue"
-        linked_to_map = "midnight blue"
-
 #-----------------------------------------------------------------------------#
 #### ------------------------------- Frames ------------------------------ ####
 #-----------------------------------------------------------------------------#
-        self.user_label = tk.Label(self, text="World Map")
+        self.user_label = ctk.CTkLabel(self, text="World Map", 
+                                       font=ctk.CTkFont(size=18, weight="bold")
+                                       )
         self.user_label.pack(pady=10)
 
 #### ------------------------- Bottom Left Frame ------------------------- ####
-        self.frame_bottom_left = tk.Frame(self, bg= bottom_bar,
-                                          height=100)
-        self.frame_bottom_left.pack(side='bottom',
-                                    fill= 'x',
-                                    padx= 20, pady= 20)
-        self.frame_bottom_left.pack_propagate(False)
+        self.frame_bottom_left = ctk.CTkFrame(self, fg_color="lightblue")
+        self.frame_bottom_left.pack(side='bottom', fill='x', padx=20, pady=20)
 
-    # IPCC Option Label
-        self.ipcc_label = tk.Label(self.frame_bottom_left,
-                                   text="Choose your IPCC Scenario",
-                                   bg=bottom_bar,
-                                   fg="white")
-        self.ipcc_label.grid(row=0, column=2, sticky='e', padx=5)
+    # Year (label)
+        self.year_label = ctk.CTkLabel(self.frame_bottom_left,
+                                       text="Please select a year:"
+                                       )
+        self.year_label.grid(row=0, column=0, columnspan=2)
 
-    # Variable to hold selected IPCC value (as integer)
-        self.ipcc_choice_var = tk.IntVar(value=4)  # default to 4
+        # Year slider (scale)
+        self.year_scale = ctk.CTkSlider(self.frame_bottom_left,
+                                        from_=1950, to=2500,
+                                        number_of_steps=(2500-1950)//5,
+                                        command=self.on_scale_change,
+                                        width=200
+                                        )
+        # Set initial year
+        self.year_scale.set(self.rounded_year)
+        self.year_scale.grid(row=2, column=0, columnspan=2, pady=5)
 
-    # IPCC Radio Buttons (1 to 4)
-        for i, val in enumerate([1, 2, 3, 4]):
-            rb = tk.Radiobutton(self.frame_bottom_left,
-                text=str(val),  # label remains as string
-                variable=self.ipcc_choice_var,
-                value=val,  # integer value
-                bg=bottom_bar,
-                fg="white",
-                selectcolor=bottom_bar,
-                activebackground=bottom_bar)
-        rb.grid(row=i+1, column=2, sticky='e', padx=5)
+        # Year value display (label)
+        self.year_value_label = ctk.CTkLabel(self.frame_bottom_left, 
+                                             text=str(self.rounded_year)
+                                             )
+        self.year_value_label.grid(row=1, column=0, columnspan=2)
+
+        # Plus/minus (button)
+        self.decrease_button = ctk.CTkButton(self.frame_bottom_left, 
+                                             text="-5", 
+                                             command=self.decrease_scale
+                                             )
+        self.decrease_button.grid(row=3, column=0, pady=5)
+
+        self.increase_button = ctk.CTkButton(self.frame_bottom_left,
+                                             text="+5", 
+                                             command=self.increase_scale
+                                             )
+        self.increase_button.grid(row=3, column=1, pady=5)
+
+    # Sea level
+        self.sea_level_title = ctk.CTkLabel(self.frame_bottom_left, 
+                                            text="Sea level:"
+                                            )
+        self.sea_level_title.grid(row=1, column=3, padx=5)
+
+        self.sea_level_label = ctk.CTkLabel(self.frame_bottom_left, 
+                                            text="0.254 m"
+                                            )
+        self.sea_level_label.grid(row=2, column=3, padx=5)
+
+    # IPCC (label)
+        self.ipcc_label = ctk.CTkLabel(self.frame_bottom_left, 
+                                       text="Choose your IPCC Scenario:"
+                                       )
+        self.ipcc_label.grid(row=0, column=4)
+
+        # IPCC (radiobutton)
+        self.ipcc_choice_var = ctk.IntVar(value=4)
+        values = {"IPCC-1": 1, "IPCC-2": 2, "IPCC-3": 3, "IPCC-4": 4}
+        for i, (text, value) in enumerate(values.items()):
+            rb = ctk.CTkRadioButton(self.frame_bottom_left,
+                                    text=text,
+                                    variable=self.ipcc_choice_var,
+                                    value=value)
+            rb.grid(row=i + 1, column=4, pady=2)
 
     # Generate map (button)
-        self.generate_button = tk.Button(self.frame_bottom_left,
-                                        text="Generate map",
-                                        command = self.show_map,
-                                        bg= linked_to_map,
-                                        fg= "white")
-        self.generate_button.grid(row=1, column= 10,
-                                  padx=10, pady=10)
-
-    # Scale (label)
-        self.year_label = tk.Label(self.frame_bottom_left,
-                                        text="Please select a year:",
-                                        bg= bottom_bar)
-        self.year_label.grid(row=0, column= 0)
-
-    # Scale (widget)
-        self.year_scale = tk.Scale(self.frame_bottom_left,
-                                   from_=1950, to=2500,
-                                   resolution= 5,
-                                   orient="horizontal",
-                                   command=self.on_scale_change,
-                                   bg= bottom_bar)
-        self.year_scale.set(self.rounded_year)
-        self.year_scale.grid(row=1, column= 0)
-
-    # Sea level (label)
-        self.sea_level_label = tk.Label(self.frame_bottom_left,
-                                        text="Sea level:",
-                                        bg= bottom_bar)
-        self.sea_level_label.grid(row=1, column= 1)
-        self.on_scale_change(self.year_scale.get())
-
-
-    # Plus five (button)
-        self.increase_button = tk.Button(self.frame_bottom_left,
-                                          text="+5",
-                                          command=self.increase_scale,
-                                          bg= bottom_bar)
-        self.increase_button.grid(row=2, column= 0, sticky= "e")
-
-    # Minus five (button)
-        self.decrease_button = tk.Button(self.frame_bottom_left,
-                                          text="-5",
-                                          command=self.decrease_scale,
-                                          bg= bottom_bar)
-        self.decrease_button.grid(row=2, column= 0, sticky= "w")
+        self.generate_button = ctk.CTkButton(self.frame_bottom_left, 
+                                             text="Generate map", 
+                                             command=self.show_map
+                                             )
+        self.generate_button.grid(row=2, column=5, padx=10)
 
 #### ------------------------- Right Side Frame -------------------------- ####
-        self.frame_right = tk.Frame(self, bg= "pink", width=300)
-        self.frame_right.pack(side='right', anchor ='n', fill= 'y',
-                              padx= 20, pady= 0)
+        self.frame_right = ctk.CTkFrame(self, width=300)
+        self.frame_right.pack(side='right', anchor='n', fill='y', padx=20)
         self.frame_right.pack_propagate(False)
 
+    # View mode (label)
+        self.view_mode_label = ctk.CTkLabel(self.frame_right,
+                                            text="View Mode:"
+                                            )
+        self.view_mode_label.grid(row=1, column=1, pady=(10,0))
 
-        # View Mode (Label)
-        self.view_mode_label = tk.Label(self.frame_right,
-                                        text= "View Mode:")
-        self.view_mode_label.grid(row=1, column=1)
-
-
-        # View Mode Value (Label)
-        self.view_mode_value = tk.Label(self.frame_right,
-                                        text= "Top View")
+        self.view_mode_value = ctk.CTkLabel(self.frame_right, 
+                                            text="Top View"
+                                            )
         self.view_mode_value.grid(row=2, column=1)
 
 #### ------------------------- Main (Map) Frame ------------------------- ####
-        self.frame_map = tk.Frame(self, bg= linked_to_map,
-                                        width=300, height=200)
+        self.frame_map = ctk.CTkFrame(self, 
+                                      fg_color="midnightblue",
+                                      width=300, height=200
+                                      )
         self.frame_map.pack(fill='both', expand=True)
         self.frame_map.pack_propagate(False)
 
+        self.placeholder_label = ctk.CTkLabel(self.frame_map, 
+                                              text="You have not loaded a map yet", 
+                                              text_color="white"
+                                              )
+        self.placeholder_label.pack(expand=True)
 
-        # initial (label)
-        self.placeholder_label = tk.Label(self.frame_map,
-                                          bg= linked_to_map,
-                                          text= "You have not loaded a map yet",
-                                          fg= "white")
-        self.placeholder_label.pack(expand= True)
+        self.frame_map.bind("<Button-1>", self.on_canvas_click)
 
-        # bind click on canvas
-        #self.map_canvas.bind("<Button-1>", self.on_canvas_click)
+        # Initialize sea level label
+        self.on_scale_change(self.rounded_year)
 
 #-----------------------------------------------------------------------------#
 #### ------------------------------ Methods ------------------------------ ####
 #-----------------------------------------------------------------------------#
-
     def on_scale_change(self, value):
-        year = int(value)
-        sea_level = round(self.controller.get_sea_level(year, int(self.ipcc_choice_var.get())),3)
-        self.sea_level_label.config(text= f"Sea level:\n {sea_level} m")
+        year = int(round(float(value) / 5) * 5)  # to have step of 5 on scale
+        self.year_value_label.configure(text=str(year))
+        sea_level = round(self.controller.get_sea_level(year, int(self.ipcc_choice_var.get())), 3)
+        self.sea_level_label.configure(text=f"{sea_level} m")
 
     def increase_scale(self):
-        current_value = self.year_scale.get()
-        if current_value < self.year_scale.cget("to"):
-            self.year_scale.set(current_value + 5)
-            # self.on_scale_change(current_value + 5)
+        val = self.year_scale.get()
+        new_val = min(2500, val + 5)
+        self.year_scale.set(new_val)
+        self.on_scale_change(new_val)
+
+    def decrease_scale(self):
+        val = self.year_scale.get()
+        new_val = max(1950, val - 5)
+        self.year_scale.set(new_val)
+        self.on_scale_change(new_val)
 
     def get_ipcc_value(self):
         return int(self.ipcc_choice_var.get())
 
     def get_user_year(self):
-        return self.year_scale.get()
-
-    def decrease_scale(self):
-        current_value = self.year_scale.get()
-        if current_value > 2004:
-            self.year_scale.set(current_value - 5)
-            # self.on_scale_change(current_value - 5)
+        return int(round(self.year_scale.get() / 5) * 5)
 
     def show_map(self):
-        # Remove placeholder if still present
         if self.placeholder_label.winfo_exists():
             self.placeholder_label.destroy()
-        print("Frame map size:", self.frame_map.winfo_width(), self.frame_map.winfo_height())
-        # create the canvas
-        self.map_canvas = tk.Canvas(self.frame_map)
+            
+
+        self.map_canvas = ctk.CTkCanvas(self.frame_map)
         self.map_canvas.place(relx=0, rely=0, relwidth=1, relheight=1)
 
-        # Redraw map on the existing canvas
-        self.secondary_view.create_map(self.map_canvas,
-                                          self.frame_map.winfo_width(),
-                                          self.frame_map.winfo_height(),
-                                          self.year_scale.get(),
-                                          self.get_ipcc_value())
+        self.controller.create_map(self.map_canvas,
+                                   self.frame_map.winfo_width(),
+                                   self.frame_map.winfo_height(),
+                                   self.get_user_year(),
+                                   self.get_ipcc_value())
 
         self.map_canvas.bind("<Button-1>", self.on_canvas_click)
 
     def on_canvas_click(self, event=None):
-        # Store the x and y coordinates of the click
-        x = event.x
-        y = event.y
-        print(f"Clicked at: ({x}, {y})")
-        return(x,y)
+        self.x, self.y = event.x, event.y
+        print(f"Clicked at: ({self.x}, {self.y})")
+        self.controller.find_country()
 
-        # add a point to the canvas at the clicked location
-        # self.controller.add_point(self.map_canvas, x, y)
+    def back_to_map(self, event):
+        self.secondary_view.redraw()
 
 
 if __name__ == "__main__":
+    ctk.set_appearance_mode("light")  # Or "light"
+    #ctk.set_default_color_theme("blue")
     app = MainView()
     app.mainloop()
