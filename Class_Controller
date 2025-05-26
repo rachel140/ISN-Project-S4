@@ -1,13 +1,46 @@
 from Class_SeaLevel import SeaLevel
 from Class_ElevationData import ElevationData
+from Class_ProfileView import ProfileView
+from Class_Coordinate_Converter import CoordinateConverter
 
 class Controller:
 
     def __init__(self):
-        self.SeaLevel = SeaLevel()
-        self.ElevationData = ElevationData("ETOPO_2022_v1_60s_N90W180_bed.nc")
+        self.sea_level = SeaLevel()
+        self.elevation_data = ElevationData("ETOPO_2022_v1_60s_N90W180_bed.nc")
+        self.main_view = None
+        self.secondary_view = None
+        self.profile_view = ProfileView()
+        self.coordinate_converter = CoordinateConverter()
 
     def get_sea_level(self, year, scenario):
-        sea_level = self.SeaLevel.retrieve_sea_level(year, scenario)
+        sea_level = self.sea_level.retrieve_sea_level(year, scenario)
         return sea_level
+    
+    def set_views(self, mainview, secondaryview):
+        self.main_view = mainview
+        self.secondary_view = secondaryview
+        
+    def get_where_clicked(self):
+        x, y = self.main_view.x, self.main_view.y
+        lat, lon = self.coordinate_converter.canvas_to_geo(x=x, y=y,
+                                                            canvas=self.secondary_view.canvas,
+                                                            base_image=self.secondary_view.base_image,
+                                                            lats=self.secondary_view.lats,      
+                                                            lons=self.secondary_view.lons,      
+                                                            pan_x=self.secondary_view.pan_x,
+                                                            pan_y=self.secondary_view.pan_y,
+                                                            zoom=self.secondary_view.zoom
+                                                            )
+
+        return (lat, lon)
+        
+    def create_map(self, frame, width, height, year, scenario):
+        self.secondary_view.create_map(frame, width, height, year, scenario)
+        
+    def find_country(self):
+        if self.elevation_data.test_if_point_in(self.get_where_clicked()):
+            self.profile_view.triangle_canvas(self.secondary_view.canvas)
+
+
 
