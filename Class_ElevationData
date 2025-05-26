@@ -1,6 +1,7 @@
 import csv
 import netCDF4 as nc
-
+from shapely.geometry import Polygon
+from math import cos
 
 class ElevationData:
 
@@ -131,7 +132,7 @@ def test_if_point_in(self, where_clicked):
         dico_per_long[longitude]= average
     return dico_per_long
     
-def compute_refugees(self, year, elevation_year, eleavtion_2025):
+def compute_refugees(self, year, elevation_year, elevation_2025):
         """
         Compute the number of climatic refugees due to the elevation of sea level.
         Define the limits of the continents considering the points the most at north, east, south and west of each continent.
@@ -144,26 +145,50 @@ def compute_refugees(self, year, elevation_year, eleavtion_2025):
 
         """
         nb_refugees = 0   #initialize the number of climatic refugees to zero in 2025
-        one_deg_lat = 111000   #conversion of one degree in latitude into a distance in meters
+        one_deg_lat = 111320   #conversion of one degree in latitude into a distance in meters
         one_deg_long = 111320  #conversion of one degree in longitude into a distance in meters
-        elevation = self.controller.elevation
+        
+        #Define the average inhabitant density for each continent
         avg_inhabitant_density_asia = 149,7
         avg_inhabitant_density_africa = 47,2
         avg_inhabitant_density_america = 33,7
         avg_inhabitant_density_europe = 24,3
         avg_inhabitant_density_oceania = 5,2
+        
+        #Define the limits of each continent and create polygons with these limits
         limits_asia= [(81.287, 95.521),(65.781,169.057),(-11.009, 122.876),(39.480, 26.063)]
-        
+        polygon_asia = Polygon(limits_asia)
         limits_africa = [(37.347, 9.745), (10.445, 51.414), (-34.829, 20.003), (14.741, -17.529)]
+        polygon_africa = Polygon(limits_africa)
         limits_america = [(72.002, -94.567), (-7.155, -34.793), (-53.896, -71.301),(65.641, -168.142)]
+        polygon_america = Polygon(limits_america)
         limits_europe = [(71.131, 27.652), (68.314, 68.264), (36, -5.600), (38.783, -9.500)]
+        polygon_europe = Polygon(limits_europe)
         limits_oceania = [(28.417, -178.333), (-24.4, -124.800), (52.617, 168.133), (-53.022, 72.578)]
+        polygon_oceania = Polygon(limits_oceania)
         
-        if year > 2025:
+        if year > 2025:  #Check if the user chose a year in the future
             for elev, list_points in self.elevation_dict.items():
-                if elev > elevation_year and elev <= elev_2025:
-                    for point in list_points: 
-                        if ...
+                if elev > elevation_year and elev <= elevation_2025:
+                    for coord in list_points: 
+                        point = Point(coord)
+                        surface = one_deg_lat * one_deg_long * cos(coord[0])  #compute the surface covered by each point according to its latitude
+                        if polygon_asia.contains(point):
+                            nb_refugees += avg_inhabitant_density_asia * surface
+                            
+                        elif polygon_africa.contains(point):
+                            nb_refugees += avg_inhabitant_density_africa * surface
+                            
+                        elif polygon_america.contains(point):                            
+                            nb_refugees += avg_inhabitant_density_america * surface
+                            
+                        elif polygon_europe.contains(point):                            
+                            nb_refugees += avg_inhabitant_density_europe * surface
+                            
+                        elif polygon_oceania.contains(point):                            
+                            nb_refugees += avg_inhabitant_density_oceania * surface
+                            
+        return nb_refugees
 
 file_name = 'ETOPO_2022_v1_60s_N90W180_bed.nc'
 file_france = 'fr_with_elevation.csv'
