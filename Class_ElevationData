@@ -86,10 +86,10 @@ class ElevationData:
             for i in range(len(dico_country)):
                 new_country[i] = dico_country[i]
 
- def build_dico_per_long (new_country) : 
+ def build_dico_per_long (new_country, sea_level) : 
     
     """
-    This functions computes the average of all the elevations for each longitude of the country
+    This functions computes the average of all the elevations above the water for each longitude of the country
     
     Parameters : 
     -------
@@ -105,8 +105,8 @@ class ElevationData:
     for i in new_country : 
         longitude = new_country[i][1]
         elevation = new_country[i][2]
-        if longitude in dico_per_long :
-            dico_per_long[longitude].append(elevation)
+        if longitude in dico_per_long and elevation > sea_level : #only take into account points that are above the water
+            dico_per_long[longitude].append(elevation - sea_level)
         else : 
             dico_per_long[longitude]=[elevation]
     for longitude, elevations in dico_per_long.items() :
