@@ -86,34 +86,34 @@ class ElevationData:
             for i in range(len(dico_country)):
                 new_country[i] = dico_country[i]
 
-    # def build_dico_per_long (new_country) :
-    #     """
-    #     This functions computes the average of all the elevations for each longitude of the country
-
-    #     Parameters :
-    #         -------
-    #         new_country: dict
-
-    #     Returns :
-    #     -------
-    #     country_per_long: dict
-    #     Of the form { long : average_lat …}
-    #     """
-
-    #     #  new_country = { point _2= [lat2, long2, elev2]..  : dict
-
-    #     dico_per_long = {}
-    #     for i in new_country :
-    #         longitude = new_country.[i][1]
-    #         elevation = new_country.[i][2]
-    #         if longitude in dico_per_long :
-    #             dico_per_long[longitude].append(elevation)
-    #         else :
-    #             dico_per_long[longitude]=[elevation]
-    #     for j in dico_per_long.values :
-    #         average = (sum(j)/(len(j))
-    #         dico_per_long[i]=average
-    #     return dico_per_long
+ def build_dico_per_long (new_country) : 
+    
+    """
+    This functions computes the average of all the elevations for each longitude of the country
+    
+    Parameters : 
+    -------
+    new_country: dict
+    
+    Returns : 
+    -------
+    country_per_long: dict
+    Of the form { long : average_elevation …}
+    """
+    
+    dico_per_long = {} 
+    for i in new_country : 
+        longitude = new_country[i][1]
+        elevation = new_country[i][2]
+        if longitude in dico_per_long :
+            dico_per_long[longitude].append(elevation)
+        else : 
+            dico_per_long[longitude]=[elevation]
+    for longitude, elevations in dico_per_long.items() :
+        average = (sum(elevations)/(len(elevations)))
+        dico_per_long[longitude]= average
+    return dico_per_long
+    
 
 
 file_name = 'ETOPO_2022_v1_60s_N90W180_bed.nc'
