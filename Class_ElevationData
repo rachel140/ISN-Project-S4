@@ -104,33 +104,24 @@ def test_if_point_in(self, where_clicked):
             is_inside = self.polygon.contains(point)
             return is_inside
 
- def build_dico_per_long (new_country, sea_level) : 
+def build_dico_per_long(sea_level):
+        fichier_csv = 'fr_mainland_only.csv'
+        coordinates = pd.read_csv(fichier_csv, encoding='utf-8', delimiter=",")
     
-    """
-    This functions computes the average of all the elevations above the water for each longitude of the country
+        # round longitude to 1 decimal place
+        coordinates['Longitude'] = coordinates['Longitude'].round(1)
     
-    Parameters : 
-    -------
-    new_country: dict
+        # compute average elevation per longitude
+        grouped = coordinates.groupby('Longitude')['Elevation'].mean()
     
-    Returns : 
-    -------
-    country_per_long: dict
-    Of the form { long : average_elevation …}
-    """
-    
-    dico_per_long = {} 
-    for i in new_country : 
-        longitude = new_country[i][1]
-        elevation = new_country[i][2]
-        if longitude in dico_per_long and elevation > sea_level : #only take into account points that are above the water
-            dico_per_long[longitude].append(elevation - sea_level)
-        else : 
-            dico_per_long[longitude]=[elevation]
-    for longitude, elevations in dico_per_long.items() :
-        average = (sum(elevations)/(len(elevations)))
-        dico_per_long[longitude]= average
-    return dico_per_long
+        # filter based on the sea level
+        dico_per_long = {}
+        for lon, avg_elev in grouped.items():
+            if avg_elev > sea_level:
+                adjusted_elev = round(avg_elev - sea_level)
+                dico_per_long[lon] = adjusted_elev
+
+        return dico_per_long
     
 def compute_refugees(self, year, elevation_year, elevation_2025):
         """
