@@ -6,14 +6,14 @@ class SeaLevel:
         self.load_data_sea_level("Sea_level_rise.csv")
 
     def load_data_sea_level(self, file_sea_level, delimiteur = ';', jump_first_line = True):
-        dico_sea_level = {}
+        dico_sea_level_past = {}
         with open(file_sea_level, 'r', encoding = 'utf-8') as our_data:
             csvReader = csv.reader(our_data, delimiter = delimiteur)
             if jump_first_line:
                 next(csvReader)
             for row in csvReader:
                 if int(row[0]) % 5 == 0:   #Keep only the values every five years
-                    self.dico_sea_level[int(row[0])]= float(row[1])
+                    self.dico_sea_level_past[int(row[0])]= float(row[1])
        
         
 
