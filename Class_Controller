@@ -1,7 +1,7 @@
 from Class_SeaLevel import SeaLevel
 from Class_ElevationData import ElevationData
 from Class_ProfileView import ProfileView
-from Class_Coordinate_Converter import CoordinateConverter
+from Class_CoordinateConverter import CoordinateConverter
 
 class Controller:
 
@@ -12,10 +12,13 @@ class Controller:
         self.secondary_view = None
         self.profile_view = ProfileView()
         self.coordinate_converter = CoordinateConverter()
-
-    def get_sea_level(self, scenario):
-        self.scenraio = self.main_view.get_ipcc_value()
         self.year = self.main_view.get_user_year()
+        self.scenario = self.main_view.get_ipcc_value()
+        
+    def get_sea_level(self, scenario):
+        
+        
+        
         self.sea_level_value = self.sea_level.retrieve_sea_level(self.year, scenario)
         return self.sea_level_value
     
@@ -43,6 +46,10 @@ class Controller:
     def find_country(self):
         if self.elevation_data.test_if_point_in(self.get_where_clicked()):
             self.profile_view.triangle_canvas(self.secondary_view.canvas)
-
+            
+    def get_number_refugees(self):
+        elevation_2025 = self.sea_level.retrieve_sea_level(2025, self.scenario)
+        self.elevation_data.compute_refugees(self, self.year, self.sea_level_value, elevation_2025)
+        
 
 
