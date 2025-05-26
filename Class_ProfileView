@@ -27,7 +27,7 @@ class ProfileView:
         sea_height = 20     # height of the blue sea at the bottom -nb of pixels
 
         # determination highest elevation to set canvas height
-        max_elev = max(self.country_per_long.values()) +self.sea_level
+        max_elev = max(self.country_per_long.values()) 
 
         # computation size canvas 
         width = len(self.country_per_long) * space_x + 2 * margin_x
