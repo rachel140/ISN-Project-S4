@@ -53,9 +53,9 @@ class ElevationData:
             # Loop through selected lat/lon lists
             for i in lat_indices:
                 for j in lon_indices:
-                    lat = float(lats[i])
-                    lon = float(lons[j])
-                    elev = float(elevations[i, j])
+                    lat = round(float(lats[i]), 3)
+                    lon = round(float(lons[j]), 3)
+                    elev = round(float(elevations[i, j]), 3)
 
                     # Initialize list for this elevation if it doesn't exist
                     if elev not in self.elevation_dict:
