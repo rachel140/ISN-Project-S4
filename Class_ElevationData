@@ -53,9 +53,9 @@ class ElevationData:
             # Loop through selected lat/lon lists
             for i in lat_indices:
                 for j in lon_indices:
-                    lat = round(float(lats[i]), 3)
-                    lon = round(float(lons[j]), 3)
-                    elev = round(float(elevations[i, j]), 3)
+                    lat = round(float(lats[i]))
+                    lon = round(float(lons[j]))
+                    elev = round(float(elevations[i, j]))
 
                     # Initialize list for this elevation if it doesn't exist
                     if elev not in self.elevation_dict:
@@ -114,7 +114,39 @@ class ElevationData:
         dico_per_long[longitude]= average
     return dico_per_long
     
+def compute_refugees(self, year, elevation_year, eleavtion_2025):
+        """
+        Compute the number of climatic refugees due to the elevation of sea level.
+        Define the limits of the continents considering the points the most at north, east, south and west of each continent.
+        store these limits in lists of tuples (lat, long) in order north, east, south and west:
+            limits_continent= [(lat_max_north, long_max_north),(lat_max_east, long_max_east),(lat_max_south, long_max_south),(lat_max_west, long_max_west)]
 
+        Returns:
+        -------
+            nb_refugees: (int) number of climatic refugees according to the year chosen by the user and the scenario.
+
+        """
+        nb_refugees = 0   #initialize the number of climatic refugees to zero in 2025
+        one_deg_lat = 111000   #conversion of one degree in latitude into a distance in meters
+        one_deg_long = 111320  #conversion of one degree in longitude into a distance in meters
+        elevation = self.controller.elevation
+        avg_inhabitant_density_asia = 149,7
+        avg_inhabitant_density_africa = 47,2
+        avg_inhabitant_density_america = 33,7
+        avg_inhabitant_density_europe = 24,3
+        avg_inhabitant_density_oceania = 5,2
+        limits_asia= [(81.287, 95.521),(65.781,169.057),(-11.009, 122.876),(39.480, 26.063)]
+        
+        limits_africa = [(37.347, 9.745), (10.445, 51.414), (-34.829, 20.003), (14.741, -17.529)]
+        limits_america = [(72.002, -94.567), (-7.155, -34.793), (-53.896, -71.301),(65.641, -168.142)]
+        limits_europe = [(71.131, 27.652), (68.314, 68.264), (36, -5.600), (38.783, -9.500)]
+        limits_oceania = [(28.417, -178.333), (-24.4, -124.800), (52.617, 168.133), (-53.022, 72.578)]
+        
+        if year > 2025:
+            for elev, list_points in self.elevation_dict.items():
+                if elev > elevation_year and elev <= elev_2025:
+                    for point in list_points: 
+                        if ...
 
 file_name = 'ETOPO_2022_v1_60s_N90W180_bed.nc'
 file_france = 'fr_with_elevation.csv'
