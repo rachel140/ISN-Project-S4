@@ -86,6 +86,23 @@ class ElevationData:
             for i in range(len(dico_country)):
                 new_country[i] = dico_country[i]
 
+def create_polygon(self, fichier_csv):
+            df = pd.read_csv(fichier_csv, encoding='utf-8', delimiter=",")
+            coords = []
+            for (_, row) in df.iterrows():
+                lat = row['Latitude']
+                lon = row['Longitude']
+                coords.append((lon, lat))
+            #print(len(coords))
+            self.polygon = Polygon(coords)
+            return self.polygon
+            
+def test_if_point_in(self, where_clicked):
+            lat, lon = where_clicked
+            point = Point(lon, lat)
+            is_inside = self.polygon.contains(point)
+            return is_inside
+
  def build_dico_per_long (new_country, sea_level) : 
     
     """
