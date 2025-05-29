@@ -1,5 +1,6 @@
 import datetime
 import customtkinter as ctk
+import tkinter as tk
 
 from Class_Controller import Controller
 from Class_SecondaryView import SecondaryView
@@ -11,17 +12,18 @@ class MainView(ctk.CTk):
         super().__init__()
         self.title("Map")
         self.geometry("900x600")
+        ctk.set_appearance_mode("light")
 
         current_year = datetime.datetime.now().year
         self.rounded_year = min(2500, max(2000, 5 * round(current_year / 5)))
 
         self.controller = Controller()
-        self.secondary_view = SecondaryView()
+        self.secondary_view = SecondaryView(self.controller)
+
         self.coordinate_converter = CoordinateConverter()
         self.create_widget()
 
         self.controller.set_views(self, self.secondary_view)
-
     def create_widget(self):
 #-----------------------------------------------------------------------------#
 #### ------------------------------- Frames ------------------------------ ####
@@ -120,6 +122,12 @@ class MainView(ctk.CTk):
                                             text="Top View"
                                             )
         self.view_mode_value.grid(row=2, column=1)
+        
+    #testing the profile
+        self.profile_button = ctk.CTkButton(self.frame_right,
+                                            text="Profile_button",
+                                            )
+        self.profile_button.grid(row=2, column=1)
 
 #### ------------------------- Main (Map) Frame ------------------------- ####
         self.frame_map = ctk.CTkFrame(self, 
@@ -134,9 +142,10 @@ class MainView(ctk.CTk):
                                               text_color="white"
                                               )
         self.placeholder_label.pack(expand=True)
-
-        self.frame_map.bind("<Button-1>", self.on_canvas_click)
-
+        self.loading_label = ctk.CTkLabel(self.frame_map, 
+                                          text="Map is loading...", 
+                                          text_color="white")
+        
         # Initialize sea level label
         self.on_scale_change(self.rounded_year)
 
@@ -146,7 +155,7 @@ class MainView(ctk.CTk):
     def on_scale_change(self, value):
         year = int(round(float(value) / 5) * 5)  # to have step of 5 on scale
         self.year_value_label.configure(text=str(year))
-        sea_level = round(self.controller.get_sea_level(year, int(self.ipcc_choice_var.get())), 3)
+        sea_level = round(self.controller.get_sea_level(self.get_user_year(), int(self.get_ipcc_value())), 3)
         self.sea_level_label.configure(text=f"{sea_level} m")
 
     def increase_scale(self):
@@ -166,34 +175,31 @@ class MainView(ctk.CTk):
 
     def get_user_year(self):
         return int(round(self.year_scale.get() / 5) * 5)
-
+    
     def show_map(self):
+        # Show the loading label
+        self.loading_label.place(relx=0.5, rely=0.5, anchor='center')
+    
+        # Remove placeholder if it exists
         if self.placeholder_label.winfo_exists():
             self.placeholder_label.destroy()
-            
+    
+        # Let the GUI update so the loading label is visible
+        self.update_idletasks()
+    
+        # Use .after() to delay just enough to show loading before heavy tasks
+        self.after(10, self.generate_map_canvas)
 
-        self.map_canvas = ctk.CTkCanvas(self.frame_map)
+    def generate_map_canvas(self):
+
+        self.map_canvas = tk.Canvas(self.frame_map, bg="white", highlightthickness=0)
         self.map_canvas.place(relx=0, rely=0, relwidth=1, relheight=1)
 
-        self.controller.create_map(self.map_canvas,
-                                   self.frame_map.winfo_width(),
-                                   self.frame_map.winfo_height(),
-                                   self.get_user_year(),
-                                   self.get_ipcc_value())
+        self.controller.create_map()
 
-        self.map_canvas.bind("<Button-1>", self.on_canvas_click)
-
-    def on_canvas_click(self, event=None):
-        self.x, self.y = event.x, event.y
-        print(f"Clicked at: ({self.x}, {self.y})")
-        self.controller.find_country()
-
-    def back_to_map(self, event):
-        self.secondary_view.redraw()
-
+        self.loading_label.place_forget()
 
 if __name__ == "__main__":
-    ctk.set_appearance_mode("light")  # Or "light"
-    #ctk.set_default_color_theme("blue")
+    #ctk.set_appearance_mode("light")
     app = MainView()
     app.mainloop()
