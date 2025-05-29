@@ -1,11 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Apr 17 20:51:29 2025
-
-@author: 33767
-"""
-
-
 import netCDF4 as nc
 from shapely.geometry import Polygon, Point, MultiPoint
 import pandas as pd
