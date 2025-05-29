@@ -46,7 +46,7 @@ class MainView(ctk.CTk):
         # Year slider (scale)
         self.year_scale = ctk.CTkSlider(self.frame_bottom_left,
                                         from_=1950, to=2500,
-                                        number_of_steps=(2500-1950)//5,
+                                        number_of_steps=(2500-1950)//5, #The evolution of the map and the associated sea level can only be seen for every 5 years (i.e, for 202à, 2025, 2030...)
                                         command=self.on_scale_change,
                                         width=200
                                         )
@@ -112,7 +112,7 @@ class MainView(ctk.CTk):
         self.frame_right.pack(side='right', anchor='n', fill='y', padx=20)
         self.frame_right.pack_propagate(False)
 
-    # View mode (label)
+    # View mode (label) - Indicate in which view mode we currently are
         self.view_mode_label = ctk.CTkLabel(self.frame_right,
                                             text="View Mode:"
                                             )
@@ -137,10 +137,12 @@ class MainView(ctk.CTk):
         self.frame_map.pack(fill='both', expand=True)
         self.frame_map.pack_propagate(False)
 
+        #When the user has not selected anything
         self.placeholder_label = ctk.CTkLabel(self.frame_map, 
                                               text="You have not loaded a map yet", 
                                               text_color="white"
                                               )
+        #When the user has choosen its parameters but is waiting to see the map
         self.placeholder_label.pack(expand=True)
         self.loading_label = ctk.CTkLabel(self.frame_map, 
                                           text="Map is loading...", 
@@ -153,30 +155,90 @@ class MainView(ctk.CTk):
 #### ------------------------------ Methods ------------------------------ ####
 #-----------------------------------------------------------------------------#
     def on_scale_change(self, value):
+        """
+        Adapt the year entered by the user for a one that is a multiple of 5 (i.e, 2020, 2025...).
+        Retrieve the sea level (computed in the other classes' functions) and display it to the user.
+
+        Parameters
+        ----------
+        value : int
+            Year entered by the user
+
+        Returns
+        -------
+        None.
+
+        """
         year = int(round(float(value) / 5) * 5)  # to have step of 5 on scale
         self.year_value_label.configure(text=str(year))
         sea_level = round(self.controller.get_sea_level(self.get_user_year(), int(self.get_ipcc_value())), 3)
         self.sea_level_label.configure(text=f"{sea_level} m")
 
     def increase_scale(self):
+        """
+        Increases the maximum year that can be choosen with the scale by the user.
+
+        Returns
+        -------
+        None.
+
+        """
         val = self.year_scale.get()
+        #Increases the current maximum year by 5
         new_val = min(2500, val + 5)
         self.year_scale.set(new_val)
+        #Modify the scale thanks to previous functions
         self.on_scale_change(new_val)
 
     def decrease_scale(self):
+        """
+        Decreases the minimum year that can be choosen with the scale by the user.
+
+        Returns
+        -------
+        None.
+
+        """
         val = self.year_scale.get()
+        #Decreases the current minimum year by 5
         new_val = max(1950, val - 5)
         self.year_scale.set(new_val)
+        #Modify the scale thanks to previous functions
         self.on_scale_change(new_val)
 
     def get_ipcc_value(self):
+        """
+        Store the user's choice of scenario.
+
+        Returns
+        -------
+        int
+            Chosen scenario
+
+        """
         return int(self.ipcc_choice_var.get())
 
     def get_user_year(self):
+        """
+        Retrieve the year chosen by the user and return it rounded for it to correspond to a step of 5 years.
+
+        Returns
+        -------
+        int
+            Chosen year
+
+        """
         return int(round(self.year_scale.get() / 5) * 5)
     
     def show_map(self):
+        """
+        Display the map as well as a loading label while waiting.
+
+        Returns
+        -------
+        None.
+
+        """
         # Show the loading label
         self.loading_label.place(relx=0.5, rely=0.5, anchor='center')
     
@@ -191,6 +253,14 @@ class MainView(ctk.CTk):
         self.after(10, self.generate_map_canvas)
 
     def generate_map_canvas(self):
+        """
+        Create the map.
+
+        Returns
+        -------
+        None.
+
+        """
 
         self.map_canvas = tk.Canvas(self.frame_map, bg="white", highlightthickness=0)
         self.map_canvas.place(relx=0, rely=0, relwidth=1, relheight=1)
