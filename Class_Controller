@@ -91,11 +91,27 @@ class Controller:
         self.secondary_view.create_map(frame, width, height, year, scenario) #Reuse the function defined in the SecondaryView class
         
     def find_country(self):
+        """
+        Test if the coordinates clicked correspond to a selected country (for the profile view)
+        
+        Returns :
+        ------- 
+        None
+        """
         if self.elevation_data.test_if_point_in(self.get_where_clicked()):
             self.profile_view.triangle_canvas(self.secondary_view.canvas)
             
     def get_number_refugees(self):
+        """
+        Retrieve the theoretical number of refugees for the choosen year from the computations made in ElevationData class
+
+        Returns
+        -------
+        None.
+
+        """
         elevation_2025 = self.sea_level.retrieve_sea_level(2025, self.scenario)
+        #Uses the function defined in the ElevationData class
         self.elevation_data.compute_refugees(self, self.year, self.sea_level_value, elevation_2025)
         
 
