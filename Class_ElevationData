@@ -1,6 +1,5 @@
 import netCDF4 as nc
 from shapely.geometry import Polygon, Point, MultiPoint
-from math import cos, radians
 import pandas as pd
 
 class ElevationData:
@@ -15,7 +14,7 @@ class ElevationData:
        #self.dict_test = {50: [[-80, 90], [65.234114, 100.368612]], 49: [[-80, 90], [65.234114, 100.368612]], 899: [[-80, 90], [65.234114, 100.368612]], -1000: [[-80, 90], [65.234114, 100.368612]]}
        #self.dict_test = dict(list(self.elevation_dict.items())[5:])
        
-       self.nb_refugees = self.compute_refugees(2030,10000,0.21)
+       self.nb_refugees = self.compute_refugees(2030,50,0.21)
        print(self.nb_refugees)
        
             
@@ -52,10 +51,10 @@ class ElevationData:
             elevations = dataset.variables['z'][:]
 
             
-            # Define the step of the array to have a 0.5° resolution
-            # Convert the 15 arc-minute resolution :
-            # Given that 1°= 60 arc-minute, 0.5° = 30 arc-mintues
-            # So keep every 2nd point
+            # Define the step of the array to have a 5° resolution
+            # Convert the 60 arc-minute resolution :
+            # Given that 1°= 60 arc-minute, 5° = 300 arc-mintues
+            # So keep every 5nd point
             step = 5
 
             # Get indices that will give us data at 0.5° spacing
@@ -79,21 +78,59 @@ class ElevationData:
             
     
     def create_polygon(self, fichier_csv):
-            df = pd.read_csv(fichier_csv, encoding='utf-8', delimiter=",")
-            coords = []
-            for (_, row) in df.iterrows():
-                lat = row['Latitude']
-                lon = row['Longitude']
-                coords.append((lon, lat))
-            #print(len(coords))
-            self.polygon = Polygon(coords)
-            return self.polygon
+        """
+        Load a CSV file with coordinates and create a polygon shape from it.
+        The CSV has columns 'latitude' and 'longitude'.
+        
+        Parameters
+        ----------
+        fichier_csv : str
+            The path to the CSV file that contains the boundary coordinates.
+    
+        Returns
+        -------
+        polygon : shapely.geometry.Polygon
+            The polygon created from the coordinates.
+        """
+        # read the CSV file with the coordinates
+        df = pd.read_csv(fichier_csv, encoding='utf-8', delimiter=",")
+        coords = []
+    
+        # loop through each row to extract lat/lon and store them as (lon, lat)
+        for (_, row) in df.iterrows():
+            lat = row['Latitude']
+            lon = row['Longitude']
+            coords.append((lon, lat))  # shapely expects (x=lon, y=lat)
+    
+        # create the polygon from all the points
+        self.polygon = Polygon(coords)
+        return self.polygon
             
     def test_if_point_in(self, where_clicked):
-            lat, lon = where_clicked
-            point = Point(lon, lat)
-            is_inside = self.polygon.contains(point)
-            return is_inside
+        """
+        Test if a clicked point is inside the polygon.
+        The polygon should already be created before calling this function.
+    
+        Parameters
+        ----------
+        where_clicked : tuple
+            Coordinates of the point clicked (lat, lon)
+    
+        Returns
+        -------
+        is_inside : bool
+            True if the point is inside the polygon, False otherwise
+        """
+        # extract lat/lon from the clicked point
+        lat, lon = where_clicked
+    
+        # create a shapely point using lon/lat
+        point = Point(lon, lat)
+    
+        # check if the point is inside the polygon we created
+        is_inside = self.polygon.contains(point)
+    
+        return is_inside
 
 
                     
@@ -124,20 +161,45 @@ class ElevationData:
             
         
         
-        
-    def build_dico_per_long (new_country) : 
+    def build_dico_per_long(sea_level):
         """
-        This functions computes the average of all the latitudes for each longitude of the country
-
-        Parameters : 
-            -------
-            new_country: dict
-
-        Returns : 
-            -------
-            country_per_long: dict
-            Of the form { long : average_lat …}
+        Reads a CSV file of France mainland elevation points and creates a dictionary
+        where each key is a longitude (rounded to 1 decimal) and the value is the average
+        elevation above sea level at that longitude (only if it's above sea level).
+    
+        Parameters
+        ----------
+        sea_level : float
+            The reference sea level we want to compare elevation to.
+    
+        Returns
+        -------
+        dico_per_long : dict
+            Dictionary of the form {longitude_rounded : avg_elevation_above_sea_level}
+            Only includes longitudes where the average elevation is above the sea level.
         """
+        fichier_csv = 'fr_mainland_only.csv'  # path to the CSV with mainland France elevation data
+    
+        # read the CSV with elevation + coordinates
+        coordinates = pd.read_csv(fichier_csv, encoding='utf-8', delimiter=",")
+    
+        # round longitudes to 1 decimal to group nearby points together
+        coordinates['Longitude'] = coordinates['Longitude'].round(1)
+    
+        # group points by longitude and compute the average elevation for each group
+        grouped = coordinates.groupby('Longitude')['Elevation'].mean()
+    
+        dico_per_long = {}  # final dictionary to store the results
+    
+        # loop through the grouped data
+        for lon, avg_elev in grouped.items():
+            # only keep longitudes where average elevation is above sea level
+            if avg_elev > sea_level:
+                adjusted_elev = round(avg_elev - sea_level)  # elevation above sea level
+                dico_per_long[lon] = adjusted_elev  # store it in the dictionary
+    
+        return dico_per_long  # return the final dictionary
+    
         
     def compute_refugees(self, year, elevation_year, elevation_2022):
         """
@@ -145,72 +207,88 @@ class ElevationData:
         Define the limits of the continents considering the points the most at north, east, south and west of each continent.
         store these limits in lists of tuples (lat, long) in order north, east, south and west:
             limits_continent= [(lat_max_north, long_max_north),(lat_max_east, long_max_east),(lat_max_south, long_max_south),(lat_max_west, long_max_west)]
-
+    
         Returns:
         -------
             nb_refugees: (int) number of climatic refugees according to the year chosen by the user and the scenario.
-
         """
         nb_refugees = 32000000   #initialize the number of climatic refugees to 32 million in 2022
         one_deg_lat = 111.320   #conversion of one degree in latitude into a distance in kilometers
         one_deg_long = 111.320  #conversion of one degree in longitude into a distance in kilometers
-        
-        #Define the average inhabitant density for each continent in number of inhabitants per squared kilometer
-        avg_inhabitant_density_asia = 149.7
-        avg_inhabitant_density_africa = 47.2
-        avg_inhabitant_density_america = 33.7
-        avg_inhabitant_density_europe = 109
-        avg_inhabitant_density_oceania = 5.2
-        
-        #Define the limits of each continent and create polygons with these limits
-        limits_asia = [[30.0, 80.0],   [180.0, 80.0],  [180.0, -15.0], [130.0, -15.0], [90.0, -20.0],  [50.0, -20.0], [30.0, 0.0], [20.0, 10.0],[20.0, 40.0], [30.0, 80.0] ]
-        polygon_asia = MultiPoint(limits_asia).convex_hull
-        
+    
+    
+        # # Define the base average inhabitant density for each continent in number of inhabitants per squared kilometer in 2022
+        base_density = {'asia': 149.7,'africa': 47.2,'america': 33.7,'europe': 109.0,'oceania': 5.2}
+
+        # Annual population growth rates per continent 
+        growth_rate = {'asia': 0.005,'africa': 0.025,'america': 0.007,'europe': 0.000, 'oceania': 0.012}
+
+        # Calculate how many years have passed since 2022 (no negative years)
+        years_since_2022 = max(0, year - 2022)
+        # If the user puts a year too far in the future (like 3000), we limit it to 500 years
+        # to avoid unrealistic density due to the exponential growth 
+        if year - 2022 > 500:
+            years_since_2022 = 500
+    
+        # Compute projected population densities
+        density_asia = base_density['asia'] * (1 + growth_rate['asia']) ** years_since_2022
+        density_africa = base_density['africa'] * (1 + growth_rate['africa']) ** years_since_2022
+        density_america = base_density['america'] * (1 + growth_rate['america']) ** years_since_2022
+        density_europe = base_density['europe'] * (1 + growth_rate['europe']) ** years_since_2022
+        density_oceania = base_density['oceania'] * (1 + growth_rate['oceania']) ** years_since_2022
+    
+    
+        # Define the limits of each continent and create polygons with these limits
+        limits_asia = [[30.0, 80.0], [180.0, 80.0], [180.0, -15.0], [130.0, -15.0], [90.0, -20.0], [50.0, -20.0], [30.0, 0.0], [20.0, 10.0], [20.0, 40.0], [30.0, 80.0]]
+        polygon_asia = MultiPoint(limits_asia).convex_hull  # Create the polygon that approximates Asia's shape
+    
         limits_africa = [[-30.0, 40.0], [60.0, 40.0], [60.0, -40.0], [20.0, -50.0], [-30.0, -40.0], [-30.0, 0.0], [-30.0, 40.0]]
         polygon_africa = MultiPoint(limits_africa).convex_hull
-        
+    
         limits_namerica = [[-170.0, 85.0], [-30.0, 85.0], [-30.0, 10.0], [-60.0, 5.0], [-100.0, 5.0], [-170.0, 10.0], [-170.0, 85.0]]
         polygon_namerica = MultiPoint(limits_namerica).convex_hull
-        
+    
         limits_samerica = [-90.0, 15.0], [-30.0, 15.0], [-30.0, -60.0], [-90.0, -60.0], [-90.0, 15.0]
         polygon_samerica = MultiPoint(limits_samerica).convex_hull
-        
+    
         limits_europe = [-30.0, 75.0], [60.0, 75.0], [60.0, 35.0], [30.0, 30.0], [0.0, 30.0], [-30.0, 40.0], [-30.0, 75.0]
         polygon_europe = MultiPoint(limits_europe).convex_hull
-        
-        limits_oceania = [ [110.0, 0.0], [180.0, 0.0], [180.0, -50.0], [110.0, -50.0], [110.0, 0.0] ]
+    
+        limits_oceania = [[110.0, 0.0], [180.0, 0.0], [180.0, -50.0], [110.0, -50.0], [110.0, 0.0]]
         polygon_oceania = MultiPoint(limits_oceania).convex_hull
-        
-        if year > 2022:  #Check if the user chose a year in the future
+    
+        if year > 2022:  # Check if the user chose a year in the future
             for elev, list_points in self.elevation_dict.items():
-                
-            #for elev, list_points in self.dict_test.items():
+    
+                # Loop through all elevation levels between the 2022 level and the level in the chosen future year
                 if elev < elevation_year and elev >= elevation_2022:
                     for coord in list_points: 
-                        point = Point(coord[1], coord[0])
+                        point = Point(coord[1], coord[0])  # Create a point with longitude first (x), then latitude (y)
                         
-                        #surface = one_deg_lat * one_deg_long * abs(cos(radians(coord[0])))  #compute the surface covered by each point according to its latitude
+                        # Approximate surface affected by one point (flat Earth assumption for simplicity)
                         surface = one_deg_lat * one_deg_long
                         
+                        # Check which continent the point belongs to and compute number of refugees
                         if polygon_asia.contains(point):
-                            nb_refugees += avg_inhabitant_density_asia * surface
+                            # Add number of refugees based on population density and affected area
+                            nb_refugees += density_asia * surface
                             
                         elif polygon_africa.contains(point):
-                            nb_refugees += avg_inhabitant_density_africa * surface
+                            nb_refugees += density_africa * surface
                             
                         elif polygon_namerica.contains(point):                            
-                            nb_refugees += avg_inhabitant_density_america * surface
+                            nb_refugees += density_america * surface
                             
                         elif polygon_samerica.contains(point):                            
-                            nb_refugees += avg_inhabitant_density_america * surface
+                            nb_refugees += density_america * surface
                             
                         elif polygon_europe.contains(point):                            
-                            nb_refugees += avg_inhabitant_density_europe * surface
+                            nb_refugees += density_europe * surface
                             
                         elif polygon_oceania.contains(point):                            
-                            nb_refugees += avg_inhabitant_density_oceania * surface
-                            
-        return nb_refugees
+                            nb_refugees += density_oceania * surface
+    
+        return nb_refugees  # Return the total number of estimated refugees
                         
                             
                             
@@ -253,9 +331,3 @@ class ElevationData:
     #                 canvas.create_circle(x-1, y-1, x+1, y+1, fill="green", width=2) # Color each point at a given elevation above sea level in green
                     
         
-
-file_name = 'ETOPO_2022_v1_60s_N90W180_bed.nc'
-file_france = 'fr_with_elevation.csv'
-file_java = 'id.json'
-file_bazil = 'geoBoundaries-BRA-ADM0_simplified.geojson'
-dict_sea = ElevationData(file_name)
