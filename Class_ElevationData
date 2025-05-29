@@ -3,21 +3,23 @@ from shapely.geometry import Polygon, Point, MultiPoint
 import pandas as pd
 
 class ElevationData:
-    
-    def __init__(self, file_name):
-        
-        
+
+    def __init__(self, world_map, contour_map):
+
+       self.netcdf_files  = world_map
+       self.contour_map = contour_map
        
-       self.netcdf_files  = file_name
        self.elevation_dict = {} # Initialize an empty dictionary: { elevation → [[lat, lon], ...] }
-       self.create_elevation()
+       self.polygon = None
        #self.dict_test = {50: [[-80, 90], [65.234114, 100.368612]], 49: [[-80, 90], [65.234114, 100.368612]], 899: [[-80, 90], [65.234114, 100.368612]], -1000: [[-80, 90], [65.234114, 100.368612]]}
        #self.dict_test = dict(list(self.elevation_dict.items())[5:])
+       
+       #methods
+       self.create_polygon(self.contour_map)
+       self.create_elevation()
        self.climate_features = {'drought_index': 1.0,'flood_risk': 1.0, 'heatwave_days': 10, 'wildfire_risk': 1.0}
        self.nb_refugees = self.compute_refugees(2030,50,0.21)
-       print(self.nb_refugees)
-       
-            
+       #print(self.nb_refugees)            
             
     def create_elevation(self):
         
@@ -77,7 +79,7 @@ class ElevationData:
 
             
     
-    def create_polygon(self, fichier_csv):
+    def create_polygon(self, csv_file):
         """
         Load a CSV file with coordinates and create a polygon shape from it.
         The CSV has columns 'latitude' and 'longitude'.
@@ -93,7 +95,7 @@ class ElevationData:
             The polygon created from the coordinates.
         """
         # read the CSV file with the coordinates
-        df = pd.read_csv(fichier_csv, encoding='utf-8', delimiter=",")
+        df = pd.read_csv(csv_file, encoding='utf-8', delimiter=",")
         coords = []
     
         # loop through each row to extract lat/lon and store them as (lon, lat)
@@ -132,36 +134,9 @@ class ElevationData:
     
         return is_inside
 
-
-                    
-                    
-                    
-    def build_dico_visible_points (self):
-        """ 
-        Go through each point of the dictionary corresponding to the country clicked and test if the elevation of the point is superior to the ocean’s elevation. If not, we don’t take the point into account, 
-        If so, the point will be stored in the new dictionary, containing only points that aren’t submerged.
-
-        Parameters : 
-            -------
-            controller: Controller
-
-        Returns : 
-            -------
-            new_country : dict
-            Of the form: { point _2= [lat2, long2, elev2]..  : dict
-    
-        """
-        new_country = {}
-        if self.controller.find_country() == 'Brazil':
-            
-            dico_country = self.dico_Brazil
-            for i in range(len(dico_country)):
-                new_country[i] = dico_country[i]
                 
             
-        
-        
-    def build_dico_per_long(sea_level):
+    def build_dico_per_long(sea_level, csv_file):
         """
         Reads a CSV file of France mainland elevation points and creates a dictionary
         where each key is a longitude (rounded to 1 decimal) and the value is the average
@@ -178,27 +153,17 @@ class ElevationData:
             Dictionary of the form {longitude_rounded : avg_elevation_above_sea_level}
             Only includes longitudes where the average elevation is above the sea level.
         """
-        fichier_csv = 'fr_mainland_only.csv'  # path to the CSV with mainland France elevation data
-    
-        # read the CSV with elevation + coordinates
-        coordinates = pd.read_csv(fichier_csv, encoding='utf-8', delimiter=",")
-    
-        # round longitudes to 1 decimal to group nearby points together
+    def build_dico_per_long(self, csv_file):
+        coordinates = pd.read_csv(csv_file, encoding='utf-8', delimiter=",")
+
         coordinates['Longitude'] = coordinates['Longitude'].round(1)
-    
-        # group points by longitude and compute the average elevation for each group
         grouped = coordinates.groupby('Longitude')['Elevation'].mean()
-    
-        dico_per_long = {}  # final dict to store results
-    
-        # loop through the grouped data
+
+        dico_per_long = {}
         for lon, avg_elev in grouped.items():
-            # only keep longitudes where average elevation is above sea level
-            if avg_elev > sea_level:
-                adjusted_elev = round(avg_elev - sea_level)  # elevation above sea level
-                dico_per_long[lon] = adjusted_elev  # store it in the dict
-    
-        return dico_per_long  # return the final dictionary
+            dico_per_long[lon] = round(avg_elev)
+
+        return dico_per_long
     
         
     def compute_refugees(self, year, elevation_year, elevation_2022):
