@@ -1,3 +1,11 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Apr 17 20:51:29 2025
+
+@author: 33767
+"""
+
+
 import netCDF4 as nc
 from shapely.geometry import Polygon, Point, MultiPoint
 import pandas as pd
@@ -13,7 +21,7 @@ class ElevationData:
        self.create_elevation()
        #self.dict_test = {50: [[-80, 90], [65.234114, 100.368612]], 49: [[-80, 90], [65.234114, 100.368612]], 899: [[-80, 90], [65.234114, 100.368612]], -1000: [[-80, 90], [65.234114, 100.368612]]}
        #self.dict_test = dict(list(self.elevation_dict.items())[5:])
-       
+       self.climate_features = {'drought_index': 1.0,'flood_risk': 1.0, 'heatwave_days': 10, 'wildfire_risk': 1.0}
        self.nb_refugees = self.compute_refugees(2030,50,0.21)
        print(self.nb_refugees)
        
@@ -189,14 +197,14 @@ class ElevationData:
         # group points by longitude and compute the average elevation for each group
         grouped = coordinates.groupby('Longitude')['Elevation'].mean()
     
-        dico_per_long = {}  # final dictionary to store the results
+        dico_per_long = {}  # final dict to store results
     
         # loop through the grouped data
         for lon, avg_elev in grouped.items():
             # only keep longitudes where average elevation is above sea level
             if avg_elev > sea_level:
                 adjusted_elev = round(avg_elev - sea_level)  # elevation above sea level
-                dico_per_long[lon] = adjusted_elev  # store it in the dictionary
+                dico_per_long[lon] = adjusted_elev  # store it in the dict
     
         return dico_per_long  # return the final dictionary
     
@@ -287,10 +295,43 @@ class ElevationData:
                             
                         elif polygon_oceania.contains(point):                            
                             nb_refugees += density_oceania * surface
-    
-        return nb_refugees  # Return the total number of estimated refugees
-                        
                             
+            other_refugees = self.estimate_other_climatic_refugees(year)
+            nb_refugees += other_refugees
+    
+        return int(nb_refugees)  # Return the total number of estimated refugees
+    
+
+                    
+    def estimate_other_climatic_refugees(self, year):
+        """
+        Estimate number of climatic refugees due to the climatic events other than sea level rise.
+    
+        Parameters
+        ----------
+        year : int
+            The year chosen by the user for prediction.
+    
+        Returns
+        -------
+        refugees : int
+            Estimated number of additional climatic refugees based on the evolution of key climate features.
+        """
+    
+        # compute the number of years since 2022 and limit it to 500 to avoid unrealistic projections
+        years_passed = max(0, min(500, year - 2022))
+    
+        # compute the value of each climate feature based on its base value and the annual growth
+        drought = round(self.climate_features.get('drought_index', 0) + 0.01 * years_passed, 2)  # increase drought index
+        flood = round(self.climate_features.get('flood_risk', 0) + 0.015 * years_passed, 2)      # increase flood risk
+        heat = int(self.climate_features.get('heatwave_days', 0) + 0.8 * years_passed)           # increase number of heatwave days
+        wildfire = round(self.climate_features.get('wildfire_risk', 0) + 0.012 * years_passed, 2)  # increase wildfire risk
+    
+        # estimate the number of refugees caused by each event
+        refugees = (drought * 50000) + (flood * 100000) + (heat * 20000) + (wildfire * 75000)
+    
+        # return the total number of additional climatic refugees due to these events
+        return int(refugees)
                             
                             
                             
