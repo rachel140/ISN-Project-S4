@@ -67,6 +67,27 @@ class Controller:
         return (lat, lon)
         
     def create_map(self, frame, width, height, year, scenario):
+        """
+        Create a map adapted to the user's choice (reuse of a function from SecondaryView)
+
+        Parameters
+        ----------
+        frame : canva
+            Previous canvas
+        width : int
+            Width of the base map (for the generate_base_image function)
+        height : int
+            Height of the base map (for the generate_base_image function)
+        year : int
+            Year choosen by the user to visualize the map
+        scenario : int
+            Scenario choosen by the user to visualize the map
+
+        Returns
+        -------
+        None.
+
+        """
         self.secondary_view.create_map(frame, width, height, year, scenario) #Reuse the function defined in the SecondaryView class
         
     def find_country(self):
