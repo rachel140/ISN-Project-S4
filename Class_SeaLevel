@@ -6,6 +6,19 @@ class SeaLevel:
         self.load_data_sea_level("Sea_level_rise.csv")
 
     def load_data_sea_level(self, file_sea_level, delimiteur = ';', jump_first_line = True):
+        	"""
+            Load the data from a file containing the average sea level on Earth for all past years since 2015. Convert them into a dictionary dico_sea_level where each key corresponds to a year and the associated value corresponds to the average sea elevation.  
+            
+            Parameters:
+            ----------
+            file_sea_level: str 
+            name of the csv file containing the data for the sea level elevation for the past 10 years
+            Returns: 
+            ----------
+            dico_sea_level: dict 
+            associating each year to the average sea level 
+	        """
+
         dico_sea_level_past = {}
         with open(file_sea_level, 'r', encoding = 'utf-8') as our_data:
             csvReader = csv.reader(our_data, delimiter = delimiteur)
