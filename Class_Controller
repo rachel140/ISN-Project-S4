@@ -17,11 +17,28 @@ class Controller:
 
 
     def set_views(self, mainview, secondaryview):
+    #Defines the views as main and secondary
         self.main_view = mainview
         self.secondary_view = secondaryview
 
     def get_sea_level(self, year, scenario):
-        self.sea_level_value = self.sea_level.retrieve_sea_level(year, scenario)
+        """
+        Retrieve the sea level from the SeaLevel class and its functions
+
+        Parameters
+        ----------
+        year : int
+            Year choosen by the user to visualize
+        scenario : int
+            GIEC scenario choosen by the user to visualize
+
+        Returns
+        -------
+        self.sea_level_value : float
+            Sea level for the corresponding year and scenario
+
+        """
+        self.sea_level_value = self.sea_level.retrieve_sea_level(year, scenario) #Uses SeaLevel class function
         return self.sea_level_value
         
     def get_where_clicked(self):
