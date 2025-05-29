@@ -35,9 +35,17 @@ class Controller:
                                                                  self.main_view.get_ipcc_value()
                                                                  )
     def top_or_side(self):
-        if self.side == "top":
+        """
+        Define if we want to display to profile view or the global one.
+
+        Returns
+        -------
+        None.
+
+        """
+        if self.side == "top": #The user wants to see the global map
             self.create_map()
-        if self.side == "profile":
+        if self.side == "profile": #The user wants to see the profile view of a specific country
             self.create_profile_view()
 
     def get_sea_level(self, year, scenario):
@@ -118,22 +126,23 @@ class Controller:
                                        self.main_view.get_ipcc_value(),
                                        self.sea_level_value,
                                        )
-        self.side = "top" 
+        self.side = "top" #Set the parameter to then display the general view of the map
         
     def create_profile_map(self):
         """
-        Test if the coordinates clicked correspond to a selected country (for the profile view)
+        Prepare and draw the profile view of a country for which it is available if the user has clicked on it.
         
         Returns :
         ------- 
         None
         """
+        #If the user has clicked on the a country for which the profile view is available
         if self.elevation_data.test_if_point_in(self.get_where_clicked()):
             # Clear old ProfileView if exists
             for widget in self.main_view.frame_map.winfo_children():
                 widget.pack_forget()
     
-            # Prepare data
+            # Prepare data: dictionary of elevation with respect to the longitude (for France only)
             dico_per_long = self.elevation_data.build_dico_per_long(self.mainland_france)
             
     
@@ -143,7 +152,7 @@ class Controller:
                                            self.height, 
                                            dico_per_long, 
                                            self.sea_level)
-        self.side = "profile"
+        self.side = "profile" #Set the parameter to then display the profile view of the concerned country
             
     def get_number_refugees(self):
         """
