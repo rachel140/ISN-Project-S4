@@ -22,13 +22,13 @@ class SeaLevel:
 
 
     def compute_sea_level_1(self, year):
-        return round(3*(10**(-128))*year**38.388,3)
+        return round(6*(10**(-82))*year**24.366,3)
 
     def compute_sea_level_2(self, year):
-        return round(3*(10**(-128))*year**38.388,3)
+        return round(7*(10**(-91))*year**27.078,3)
 
     def compute_sea_level_3(self, year):
-        return round(3*(10**(-128))*year**38.388,3)
+        return round(1*(10**(-107))*year**32.127,3)
 
     def compute_sea_level_4(self, year):
         return round(3*(10**(-128))*year**38.388,3)
