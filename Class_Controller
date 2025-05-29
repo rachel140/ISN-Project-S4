@@ -42,6 +42,17 @@ class Controller:
         return self.sea_level_value
         
     def get_where_clicked(self):
+        """
+        Retrieve the geographical coordinates (lattitude and longitude) of a point from the x and y coordinates of the window
+
+        Returns
+        -------
+        lat : float
+            Lattitude of the concerned point
+        lon : float
+            Longitude of the concerned point
+
+        """
         x, y = self.main_view.x, self.main_view.y
         lat, lon = self.coordinate_converter.canvas_to_geo(x=x, y=y,
                                                             canvas=self.secondary_view.canvas,
@@ -56,7 +67,7 @@ class Controller:
         return (lat, lon)
         
     def create_map(self, frame, width, height, year, scenario):
-        self.secondary_view.create_map(frame, width, height, year, scenario)
+        self.secondary_view.create_map(frame, width, height, year, scenario) #Reuse the function defined in the SecondaryView class
         
     def find_country(self):
         if self.elevation_data.test_if_point_in(self.get_where_clicked()):
