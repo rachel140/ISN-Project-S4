@@ -1,25 +1,44 @@
 from Class_SeaLevel import SeaLevel
 from Class_ElevationData import ElevationData
 from Class_ProfileView import ProfileView
-from Class_CoordinateConverter import CoordinateConverter
+from Class_Coordinate_Converter import CoordinateConverter
 
 class Controller:
 
     def __init__(self):
+        #files used
+        self.world_elevation = "ETOPO_2022_v1_60s_N90W180_bed.nc"
+        self.mainland_france_contour = "fr_mainland_contour.csv"
+        self.mainland_france = "fr_mainland_contour.csv"
+        
+        #adding other classes
         self.sea_level = SeaLevel()
-        self.elevation_data = ElevationData("ETOPO_2022_v1_60s_N90W180_bed.nc")
         self.main_view = None
         self.secondary_view = None
         self.profile_view = ProfileView()
         self.coordinate_converter = CoordinateConverter()
-        self.year = self.main_view.get_user_year()
-        self.scenario = self.main_view.get_ipcc_value()
+        self.elevation_data = ElevationData(self.world_elevation, self.mainland_france_contour)
+        
+        #information for maps:
+        self.side = "top" 
 
 
     def set_views(self, mainview, secondaryview):
-    #Defines the views as main and secondary
         self.main_view = mainview
         self.secondary_view = secondaryview
+        
+        #information for maps:
+        self.frame = self.main_view.frame_map
+        self.width = self.main_view.frame_map.winfo_width()
+        self.height = self.main_view.frame_map.winfo_height()
+        self.sea_level_value = self.sea_level.retrieve_sea_level(self.main_view.get_user_year(),
+                                                                 self.main_view.get_ipcc_value()
+                                                                 )
+    def top_or_side(self):
+        if self.side == "top":
+            self.create_map()
+        if self.side == "profile":
+            self.create_profile_view()
 
     def get_sea_level(self, year, scenario):
         """
@@ -66,7 +85,7 @@ class Controller:
 
         return (lat, lon)
         
-    def create_map(self, frame, width, height, year, scenario):
+    def create_top_map(self, frame, width, height, year, scenario):
         """
         Create a map adapted to the user's choice (reuse of a function from SecondaryView)
 
@@ -88,9 +107,20 @@ class Controller:
         None.
 
         """
-        self.secondary_view.create_map(frame, width, height, year, scenario) #Reuse the function defined in the SecondaryView class
+        # Clear old canvas if exists
+        for widget in self.main_view.frame_map.winfo_children():
+            widget.pack_forget()
+            
+        self.secondary_view.create_map(self.frame,    #Reuse the function defined in the SecondaryView class
+                                       self.width,
+                                       self.height,
+                                       self.main_view.get_user_year(),
+                                       self.main_view.get_ipcc_value(),
+                                       self.sea_level_value,
+                                       )
+        self.side = "top" 
         
-    def find_country(self):
+    def create_profile_map(self):
         """
         Test if the coordinates clicked correspond to a selected country (for the profile view)
         
@@ -99,7 +129,21 @@ class Controller:
         None
         """
         if self.elevation_data.test_if_point_in(self.get_where_clicked()):
-            self.profile_view.triangle_canvas(self.secondary_view.canvas)
+            # Clear old ProfileView if exists
+            for widget in self.main_view.frame_map.winfo_children():
+                widget.pack_forget()
+    
+            # Prepare data
+            dico_per_long = self.elevation_data.build_dico_per_long(self.mainland_france)
+            
+    
+            # Draw profile
+            self.profile_view.draw_profile(self.frame, 
+                                           self.width, 
+                                           self.height, 
+                                           dico_per_long, 
+                                           self.sea_level)
+        self.side = "profile"
             
     def get_number_refugees(self):
         """
