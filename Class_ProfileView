@@ -26,26 +26,64 @@ class ProfileView():
 
 
     def draw_profile(self, frame, width, height, dico_per_long, sea_level):
+        """
+        Draw the profile view from the elevation, the coordinates and the sea level.
+
+        Parameters
+        ----------
+        frame : 
+            
+        width : int
+            Width of the profile view
+        height : int
+            Height of the profile view
+        dico_per_long : dict
+            Dictionary containing the longitudes and their associated elevation
+        sea_level : float
+            Sea level for the cocnerned year
+
+        Returns
+        -------
+        None.
+
+        """
         self.canvas = ctk.CTkCanvas(frame, width=width, height=height, bg="white")
         self.canvas.pack(fill=ctk.BOTH, expand=True)
         
         self.dico_per_long = dict(sorted(dico_per_long.items()))
         self.max_elevation = max(self.dico_per_long.values(), default=1)
         self.sea_level = sea_level
-        self.load_sky_image()
+        self.load_sky_image() #Background image
         self.redraw()
         
         self.canvas.bind("<Configure>", self.on_resize)
 
     def load_sky_image(self):
+        """
+        Load a background image.
+
+        Returns
+        -------
+        None.
+
+        """
         try:
             bg = Image.open("blue.jpg").convert("RGB")
             self.sky_image = bg
         except Exception as e:
             print("Error loading blue.jpg:", e)
-            self.sky_image = None
+            self.sky_image = None #Works without image if issue with it
 
     def redraw(self):
+        """
+        Draw the profile view and adapt it to the window's size
+
+        Returns
+        -------
+        None.
+
+        """
+        #Error case
         if not self.dico_per_long:
             return
     
@@ -78,6 +116,7 @@ class ProfileView():
         long_range = max_long - min_long if max_long != min_long else 1
     
         points = []
+        #Initialize the points' coordinates in adequation with the window's size
         for i, lon in enumerate(longs):
             x = int((lon - min_long) / long_range * img_width)
             elev = elevations[i]
@@ -86,6 +125,7 @@ class ProfileView():
     
         if points:
             fill_area = points + [(points[-1][0], img_height), (points[0][0], img_height)]
+            #Draw the polygon that shapes the land 
             draw.polygon(fill_area, fill=(0, 102, 51))
     
         draw.line([(0, sea_y), (img_width, sea_y)], fill="blue", width=2)
@@ -106,7 +146,8 @@ class ProfileView():
         # Y-axis ticks every 200 meters
         tick_interval = 200
         max_tick_value = ((self.max_elevation // tick_interval) + 1) * tick_interval
-    
+        
+        #Indicate the meters so that the user can see the elevation's value
         tick_value = 0
         while tick_value <= max_tick_value:
             y = int(top_margin + usable_height * (1 - tick_value / display_max_elevation))
@@ -115,6 +156,7 @@ class ProfileView():
             tick_value += tick_interval
     
         # Draw sea level tick and label in blue
+        #Indicate the value of the see level
         draw.text((bar_width+20, sea_y), f"Sea level: {float(self.sea_level)} m", fill="white", font=self.axis_font)
         #draw.text((bar_width+25, sea_y), f"{int(self.sea_level)} m", fill="white", font=self.axis_font)
     
@@ -126,4 +168,17 @@ class ProfileView():
         self.canvas.create_image(0, 0, anchor="nw", image=self.photo)
 
     def on_resize(self, event):
+        """
+        Reinitialize the drawing.
+
+        Parameters
+        ----------
+        event : TYPE
+            DESCRIPTION.
+
+        Returns
+        -------
+        None.
+
+        """
         self.redraw()
