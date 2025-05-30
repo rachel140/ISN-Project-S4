@@ -1,7 +1,7 @@
 from Class_SeaLevel import SeaLevel
 from Class_ElevationData import ElevationData
 from Class_ProfileView import ProfileView
-from Class_Coordinate_Converter import CoordinateConverter
+from Class_CoordinateConverter import CoordinateConverter
 
 class Controller:
 
