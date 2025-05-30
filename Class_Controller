@@ -77,9 +77,7 @@ class Controller:
                                        self.width,
                                        self.height,
                                        self.chosen_year,
-                                       self.main_view.get_ipcc_value(),
-                                       self.sea_level_value,
-                                       )
+                                       self.main_view.get_ipcc_value())
         self.side = "top" #Set the parameter to then display the general view of the map
 
     def create_profile_map(self):
