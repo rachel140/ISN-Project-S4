@@ -153,15 +153,21 @@ class ElevationData:
             Dictionary of the form {longitude_rounded : avg_elevation_above_sea_level}
             Only includes longitudes where the average elevation is above the sea level.
         """
-    def build_dico_per_long(self, csv_file):
+        csv_file = 'fr_mainland_only.csv'
         coordinates = pd.read_csv(csv_file, encoding='utf-8', delimiter=",")
 
+        # round longitude to 1 decimal place
         coordinates['Longitude'] = coordinates['Longitude'].round(1)
+
+        # compute average elevation per longitude
         grouped = coordinates.groupby('Longitude')['Elevation'].mean()
 
+        # filter based on the sea level
         dico_per_long = {}
         for lon, avg_elev in grouped.items():
-            dico_per_long[lon] = round(avg_elev)
+            if avg_elev > sea_level:
+                adjusted_elev = round(avg_elev - sea_level)
+                dico_per_long[lon] = adjusted_elev
 
         return dico_per_long
     
@@ -292,7 +298,7 @@ class ElevationData:
                             
                             
                             
-                            
+    ##____Old version to color the map of the world according to the sea level using dictionary_____                        
     # def draw_map(self, canvas, width, height):
     #     """
     #     Color the  map based on the sea level. 
