@@ -3,13 +3,13 @@ import numpy as np
 from PIL import Image, ImageTk
 import customtkinter as ctk
 
-from Class_Controller import Controller
+#from Class_Controller import Controller
 
 
 class SecondaryView:
-    def __init__(self):
+    def __init__(self, controller):
 
-        self.controller = Controller()
+        self.controller = controller
 
 
         self.netcdf_file = "ETOPO_2022_v1_60s_N90W180_bed.nc"
@@ -83,12 +83,17 @@ class SecondaryView:
         correctly on the canvas based on pan_x and pan_y.
         """
         # If no base image yet, no drawing needed
-        if self.base_image is None:
+        if not hasattr(self, "photo") or self.photo is None:
+            print("[DEBUG] No photo image available to draw")
             return
 
+        if not hasattr(self, "canvas") or self.canvas is None:
+            print("[DEBUG] Canvas is not initialized")
+            return
+        
         # Clear previous drawings on canvas
         self.canvas.delete("all")
-
+        self.base_image = self.canvas.create_image(int(self.pan_x), int(self.pan_y), image=self.photo, anchor=ctk.NW)
         #------we could have used self.x and self.h because we are------------#
         #------reusing them in on resize but as we need to redefine-----------#
         #------them for each resize it would be pointless to do so------------#
@@ -182,19 +187,27 @@ class SecondaryView:
         Create and set up the Tkinter canvas with the base image loaded and display it.
         Also binds resize and zoom events for interactive control.
         """
-        # Generate or update the base image for the given parameters
-        self.generate_base_image(width, height, year, scenario)
-
+        
         # Create a Tkinter Canvas widget in the provided parent frame
         canvas = ctk.CTkCanvas(frame, width=width, height=height, bg="white")
         canvas.pack(fill=ctk.BOTH, expand=True)
         self.canvas = canvas # Keep a reference to the canvas (used in profile view)
-
+                
         # Bind the canvas size change event to on_resize for dynamic resizing behavior
         self.canvas.bind("<Configure>", self.on_resize)
-
         # Bind mouse wheel events to on_zoom for zooming functionality
         self.canvas.bind("<MouseWheel>", self.on_zoom)
-
+        
+        # Generate or update the base image for the given parameters
+        pil_image = self.generate_base_image(width, height, year, scenario)
+        # Convert it to a PhotoImage
+        self.photo = ImageTk.PhotoImage(pil_image)
         # Initial drawing of the map on the canvas
-        self.redraw()
+        self.canvas.after_idle(self.safe_redraw)
+        
+    def safe_redraw(self):
+        try:
+            self.redraw()
+        except Exception as e:
+            print(f"[ERROR] Redraw failed: {e}")
+        
