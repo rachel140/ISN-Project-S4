@@ -4,7 +4,7 @@ import tkinter as tk
 
 from Class_Controller import Controller
 from Class_SecondaryView import SecondaryView
-from Class_Coordinate_Converter import CoordinateConverter
+from Class_CoordinateConverter import CoordinateConverter
 
 
 class MainView(ctk.CTk):
