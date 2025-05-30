@@ -14,39 +14,71 @@ class MainView(ctk.CTk):
         self.geometry("900x600")
         ctk.set_appearance_mode("light")
 
+        # parameters
         current_year = datetime.datetime.now().year
         self.rounded_year = min(2500, max(2000, 5 * round(current_year / 5)))
+        self.tfc = "white"                #top frame colour
+        self.cfc = "midnightblue"         # center frame colour
+        self.bfc = "lightblue"            # bottom frame colour
+        self.rfc = "lightcyan"            # right frame colour
 
+        self.font = "arial"
+        self.police = 12
+
+        # methods
         self.controller = Controller()
         self.secondary_view = SecondaryView(self.controller)
-
         self.coordinate_converter = CoordinateConverter()
-        self.create_widget()
 
+        self.create_widget()
         self.controller.set_views(self, self.secondary_view)
+
+
+
     def create_widget(self):
 #-----------------------------------------------------------------------------#
 #### ------------------------------- Frames ------------------------------ ####
 #-----------------------------------------------------------------------------#
-        self.user_label = ctk.CTkLabel(self, text="World Map", 
-                                       font=ctk.CTkFont(size=18, weight="bold")
+
+#### ----------------------------- Top Frame ----------------------------- ####
+        self.frame_top = ctk.CTkFrame(self,  fg_color=self.tfc)
+        self.frame_top.pack(side='top', fill='x')
+
+        self.title_label = ctk.CTkLabel(self.frame_top,
+                                       text="World Map",
+                                       font=ctk.CTkFont(family="times",
+                                                        size=18,
+                                                        weight="bold"
+                                                        )
                                        )
-        self.user_label.pack(pady=10)
+        self.title_label.pack()
 
+#### --------------------------- Bottom Frames --------------------------- ####
+        self.frame_bottom = ctk.CTkFrame(self, fg_color=self.cfc)
+        self.frame_bottom.pack(side='bottom', fill='x')
 #### ------------------------- Bottom Left Frame ------------------------- ####
-        self.frame_bottom_left = ctk.CTkFrame(self, fg_color="lightblue")
-        self.frame_bottom_left.pack(side='bottom', fill='x', padx=20, pady=20)
+        self.frame_bottom_left = ctk.CTkFrame(self.frame_bottom,
+                                              fg_color=self.bfc)
+        self.frame_bottom_left.pack(side='left',
+                                    fill="both",
+                                    padx=5, pady=5)
 
-    # Year (label)
+        # Year (label)
         self.year_label = ctk.CTkLabel(self.frame_bottom_left,
                                        text="Please select a year:"
                                        )
         self.year_label.grid(row=0, column=0, columnspan=2)
 
+        # Year value display (label)
+        self.year_value_label = ctk.CTkLabel(self.frame_bottom_left,
+                                             text=str(self.rounded_year)
+                                             )
+        self.year_value_label.grid(row=1, column=0, columnspan=2)
+
         # Year slider (scale)
         self.year_scale = ctk.CTkSlider(self.frame_bottom_left,
                                         from_=1950, to=2500,
-                                        number_of_steps=(2500-1950)//5, #The evolution of the map and the associated sea level can only be seen for every 5 years (i.e, for 202à, 2025, 2030...)
+                                        number_of_steps=(2500-1950)//5, #The evolution of the map and the associated sea level can only be seen for every 5 years (i.e, for 2020, 2025, 2030...)
                                         command=self.on_scale_change,
                                         width=200
                                         )
@@ -54,102 +86,131 @@ class MainView(ctk.CTk):
         self.year_scale.set(self.rounded_year)
         self.year_scale.grid(row=2, column=0, columnspan=2, pady=5)
 
-        # Year value display (label)
-        self.year_value_label = ctk.CTkLabel(self.frame_bottom_left, 
-                                             text=str(self.rounded_year)
-                                             )
-        self.year_value_label.grid(row=1, column=0, columnspan=2)
-
         # Plus/minus (button)
-        self.decrease_button = ctk.CTkButton(self.frame_bottom_left, 
-                                             text="-5", 
+        self.decrease_button = ctk.CTkButton(self.frame_bottom_left,
+                                             text="-5",
                                              command=self.decrease_scale
                                              )
         self.decrease_button.grid(row=3, column=0, pady=5)
 
         self.increase_button = ctk.CTkButton(self.frame_bottom_left,
-                                             text="+5", 
+                                             text="+5",
                                              command=self.increase_scale
                                              )
         self.increase_button.grid(row=3, column=1, pady=5)
 
     # Sea level
-        self.sea_level_title = ctk.CTkLabel(self.frame_bottom_left, 
+        self.sea_level_title = ctk.CTkLabel(self.frame_bottom_left,
                                             text="Sea level:"
                                             )
         self.sea_level_title.grid(row=1, column=3, padx=5)
 
-        self.sea_level_label = ctk.CTkLabel(self.frame_bottom_left, 
+        self.sea_level_label = ctk.CTkLabel(self.frame_bottom_left,
                                             text="0.254 m"
                                             )
         self.sea_level_label.grid(row=2, column=3, padx=5)
 
-    # IPCC (label)
-        self.ipcc_label = ctk.CTkLabel(self.frame_bottom_left, 
+
+#### ------------------------ Bottom Center Frame ------------------------ ####
+        self.frame_bottom_center = ctk.CTkFrame(self.frame_bottom, fg_color=self.bfc)
+        self.frame_bottom_center.pack(side='left',
+                                      expand=True,
+                                      fill='both',
+                                      padx=5, pady=5)
+
+        # IPCC (label)
+        self.ipcc_label = ctk.CTkLabel(self.frame_bottom_center,
                                        text="Choose your IPCC Scenario:"
                                        )
-        self.ipcc_label.grid(row=0, column=4)
+        #self.ipcc_label.grid(row=0, column=0)
+        self.ipcc_label.pack(pady=10)
 
-        # IPCC (radiobutton)
+            # IPCC (radiobutton)
         self.ipcc_choice_var = ctk.IntVar(value=4)
         values = {"IPCC-1": 1, "IPCC-2": 2, "IPCC-3": 3, "IPCC-4": 4}
         for i, (text, value) in enumerate(values.items()):
-            rb = ctk.CTkRadioButton(self.frame_bottom_left,
+            rb = ctk.CTkRadioButton(self.frame_bottom_center,
                                     text=text,
                                     variable=self.ipcc_choice_var,
                                     value=value)
-            rb.grid(row=i + 1, column=4, pady=2)
+            rb.pack(pady=5)
+            #rb.grid(row=i + 1, column=0, pady=2)
+
+#### ------------------------ Bottom Right Frame ------------------------- ####
+        self.frame_bottom_right = ctk.CTkFrame(self.frame_bottom, fg_color=self.bfc)
+        self.frame_bottom_right.pack(side='left',
+                                     expand=True,
+                                     fill='both',
+                                     padx=5, pady=5)
 
     # Generate map (button)
-        self.generate_button = ctk.CTkButton(self.frame_bottom_left, 
-                                             text="Generate map", 
+        self.generate_button = ctk.CTkButton(self.frame_bottom_right,
+                                             text="Generate map",
                                              command=self.show_map
                                              )
-        self.generate_button.grid(row=2, column=5, padx=10)
+        self.generate_button.pack(pady=25)
 
+    # Show Refugees (button)
+        self.generate_refugees = ctk.CTkButton(self.frame_bottom_right,
+                                               text="Show refugees",
+                                               command=self.count_refugees
+                                               )
+        self.generate_refugees.pack(pady=5)
+
+    #Show refugees (label)
+
+        self.show_refugees = ctk.CTkLabel(self.frame_bottom_right,
+                                          text="")
+        self.show_refugees.pack()
+
+    # Initialize sea level label
+        self.on_scale_change(self.rounded_year)
 #### ------------------------- Right Side Frame -------------------------- ####
-        self.frame_right = ctk.CTkFrame(self, width=300)
-        self.frame_right.pack(side='right', anchor='n', fill='y', padx=20)
-        self.frame_right.pack_propagate(False)
+        self.frame_right = ctk.CTkFrame(self, width=300, fg_color=self.rfc)
+        self.frame_right.pack(side='right', anchor='n', fill='y')
 
-    # View mode (label) - Indicate in which view mode we currently are
         self.view_mode_label = ctk.CTkLabel(self.frame_right,
-                                            text="View Mode:"
+                                            text="Current View Mode:",
+                                            font= ctk.CTkFont(size=self.police)
                                             )
-        self.view_mode_label.grid(row=1, column=1, pady=(10,0))
+        self.view_mode_label.pack(pady=5)
 
-        self.view_mode_value = ctk.CTkLabel(self.frame_right, 
-                                            text="Top View"
+        self.view_mode_value = ctk.CTkLabel(self.frame_right,
+                                            text='None',
+                                            font= ctk.CTkFont(size=self.police)
                                             )
-        self.view_mode_value.grid(row=2, column=1)
-        
-    #testing the profile
-        self.profile_button = ctk.CTkButton(self.frame_right,
-                                            text="Profile_button",
-                                            )
-        self.profile_button.grid(row=2, column=1)
+        self.view_mode_value.pack(pady=5)
 
-#### ------------------------- Main (Map) Frame ------------------------- ####
-        self.frame_map = ctk.CTkFrame(self, 
-                                      fg_color="midnightblue",
+        self.view_mode_exp = ctk.CTkLabel(self.frame_right,
+                                          text="",
+                                          font= ctk.CTkFont(size=self.police)
+                                          )
+        self.view_mode_exp.pack(pady=10)
+
+
+        self.exit_profile_button = ctk.CTkButton(self.frame_right,
+                                                 text="",
+                                                 )
+        self.exit_profile_button.pack(pady=20)
+
+
+#### ------------------------- Center (Map) Frame ------------------------ ####
+        self.frame_map = ctk.CTkFrame(self,
+                                      fg_color=self.cfc,
                                       width=300, height=200
                                       )
         self.frame_map.pack(fill='both', expand=True)
         self.frame_map.pack_propagate(False)
 
-        #When the user has not selected anything
-        self.placeholder_label = ctk.CTkLabel(self.frame_map, 
-                                              text="You have not loaded a map yet", 
+        self.placeholder_label = ctk.CTkLabel(self.frame_map,
+                                              text="You have not loaded a map yet",
                                               text_color="white"
                                               )
-        #When the user has choosen its parameters but is waiting to see the map
         self.placeholder_label.pack(expand=True)
-        self.loading_label = ctk.CTkLabel(self.frame_map, 
-                                          text="Map is loading...", 
+        self.loading_label = ctk.CTkLabel(self.frame_map,
+                                          text="Map is loading...",
                                           text_color="white")
-        
-        # Initialize sea level label
-        self.on_scale_change(self.rounded_year)
+
 
 #-----------------------------------------------------------------------------#
 #### ------------------------------ Methods ------------------------------ ####
@@ -184,10 +245,8 @@ class MainView(ctk.CTk):
 
         """
         val = self.year_scale.get()
-        #Increases the current maximum year by 5
         new_val = min(2500, val + 5)
         self.year_scale.set(new_val)
-        #Modify the scale thanks to previous functions
         self.on_scale_change(new_val)
 
     def decrease_scale(self):
@@ -200,10 +259,8 @@ class MainView(ctk.CTk):
 
         """
         val = self.year_scale.get()
-        #Decreases the current minimum year by 5
         new_val = max(1950, val - 5)
         self.year_scale.set(new_val)
-        #Modify the scale thanks to previous functions
         self.on_scale_change(new_val)
 
     def get_ipcc_value(self):
@@ -229,7 +286,7 @@ class MainView(ctk.CTk):
 
         """
         return int(round(self.year_scale.get() / 5) * 5)
-    
+
     def show_map(self):
         """
         Display the map as well as a loading label while waiting.
@@ -241,16 +298,16 @@ class MainView(ctk.CTk):
         """
         # Show the loading label
         self.loading_label.place(relx=0.5, rely=0.5, anchor='center')
-    
+
         # Remove placeholder if it exists
         if self.placeholder_label.winfo_exists():
             self.placeholder_label.destroy()
-    
+
         # Let the GUI update so the loading label is visible
         self.update_idletasks()
-    
+
         # Use .after() to delay just enough to show loading before heavy tasks
-        self.after(10, self.generate_map_canvas)
+        self.after(1, self.generate_map_canvas)
 
     def generate_map_canvas(self):
         """
@@ -261,13 +318,22 @@ class MainView(ctk.CTk):
         None.
 
         """
+        # self.map_canvas = tk.Canvas(self.frame_map, bg="white", highlightthickness=0)
+        # self.map_canvas.place(relx=0, rely=0, relwidth=1, relheight=1)
 
-        self.map_canvas = tk.Canvas(self.frame_map, bg="white", highlightthickness=0)
-        self.map_canvas.place(relx=0, rely=0, relwidth=1, relheight=1)
-
-        self.controller.create_map()
+        self.controller.top_or_side()
 
         self.loading_label.place_forget()
+
+    def count_refugees(self):
+        amount = self.controller.nb_refugees
+        self.show_refugees.configure(text=f"{amount}")
+
+    def change_mode_value(self, value):
+        self.view_mode_value.configure(text=f"{value}")
+        if value == "profile":
+            self.exit_profile_button.configure(text="Exit profile view")
+            self.view_mode_exp.configure(text="In the profile view,\nimagine that you\nare standing on\nEngland and\nlooking at France")
 
 if __name__ == "__main__":
     #ctk.set_appearance_mode("light")
