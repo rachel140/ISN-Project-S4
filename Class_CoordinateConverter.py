@@ -1,48 +1,24 @@
 class CoordinateConverter:
-    def __init__(self, offset_earth=360, offset_screen=600):
-        """
-        Initializes a coordinate converter to transform geographic coordinates into
-        Canvas coordinates.
+    def __init__(self):
+        pass
 
-        Args:
-            offset_earth (float): Size of the geographic region you are mapping (typically 360 for whole world longitude)
-            offset_screen (float): Size (in pixels) you want that area to appear on screen
-        """
-        self.offset_earth = offset_earth
-        self.offset_screen = offset_screen
+    def canvas_to_geo(self, x, y, canvas, base_image, lats, lons, pan_x, pan_y, zoom, lat_indices, lon_indices):
+        # Step 1: Convert canvas (display) coordinates to image pixel coordinates
+        image_x = int((x - pan_x) / zoom)
+        image_y = int((y - pan_y) / zoom)
+    
+        # Step 2: Clamp pixel coords within image bounds
+        image_x = max(0, min(image_x, base_image.width - 1))
+        image_y = max(0, min(image_y, base_image.height - 1))
+    
+        # Step 3: Map pixel indices back to lat/lon
+        lat_index = lat_indices[image_y]
+        lon_index = lon_indices[image_x]
+    
+        # Step 4: Convert to geographic coordinates
+        lat = float(lats[lat_index])
+        lon = float(lons[lon_index])
+    
+        return lat, lon
 
-    def geo_to_canvas(self, lat, lon, l_canvas, h_canvas):
-        """
-        Converts (latitude, longitude) of a point on Earth into Canvas coordinates.
 
-        Parameters
-        ----------
-        lat : float
-            Latitude of a point on Earth.
-        lon : float
-            Longitude of a point on Earth.
-        l_canvas : int
-            Width of the Canvas.
-        h_canvas : int
-            Height of the Canvas.
-
-        Returns
-        -------
-        x : float
-            X coordinate on the canvas.
-        y : float
-            Y coordinate on the canvas.
-        """
-
-        # Map longitude [-180,180] → [0, l_canvas]
-        x = (lon + 180) * (l_canvas / 360)
-
-        # Map latitude [-90,90] → [h_canvas, 0] (inverted y-axis for Canvas)
-        y = (90 - lat) * (h_canvas / 180)
-
-        # Apply scaling factor 
-        scale_factor = self.offset_screen / self.offset_earth
-        x *= scale_factor
-        y *= scale_factor
-
-        return x, y
