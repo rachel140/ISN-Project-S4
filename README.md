@@ -1,5 +1,5 @@
 Usage Instructions:
-To run the code, excute the class **MainView**.
+To run the code, excute the class **Controller**.
 
 To display the **map of the emerged land** for a specific year, use the scale to select your desired year. Once selected, click on **"Generate Map"** to display it. You can repeat the same process to view the map for a different year.
 
