@@ -60,10 +60,20 @@ class Controller:
                                                            
 
     def count_refugees(self):
+        """
+        Compute the number of climatic refugees using the function compute_refugees from the class ElevationData, 
+        according to the year chosen by the user.
+
+        Returns
+        -------
+        nb_refugees : string
+            number of climatic refugees in the form 'nb_refugees' millions.
+
+        """
         nb_refugees = self.elevation_data.compute_refugees(self.chosen_year,
                                                            self.sea_level_value,
-                                                           self.reference_elevation
-                                                           )
+                                                           self.reference_elevation)
+                                                           
         return nb_refugees
 
     def top_or_side(self):
