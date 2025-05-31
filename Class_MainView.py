@@ -1,37 +1,37 @@
 import datetime
 import customtkinter as ctk
-import tkinter as tk
 
-from Class_Controller import Controller
 from Class_SecondaryView import SecondaryView
-from Class_CoordinateConverter import CoordinateConverter
 
 
 class MainView(ctk.CTk):
-    def __init__(self):
+    def __init__(self, controller):
         super().__init__()
-        self.title("Map")
+        self.title("World Map")
         self.geometry("900x600")
-        ctk.set_appearance_mode("light")
+        ctk.set_appearance_mode("system")
 
         # parameters
         current_year = datetime.datetime.now().year
-        self.rounded_year = min(2500, max(2000, 5 * round(current_year / 5)))
-        self.tfc = "white"                #top frame colour
+        self.rounded_year = min(3000, max(2000, 5 * round(current_year / 5)))
+        self.configure(fg_color="midnight blue")
+        self.tfc = "white"                # top frame colour
         self.cfc = "midnightblue"         # center frame colour
-        self.bfc = "lightblue"            # bottom frame colour
-        self.rfc = "lightcyan"            # right frame colour
+        self.bfc = "lightblue"            # bottom and right frame colour
+        self.ffc = "azure"               # foreground frame colour
+        
+        self.bc = "steelblue"
+        self.hbc = "dodgerblue"
 
-        self.font = "arial"
+        self.font = "times"
         self.police = 12
 
         # methods
-        self.controller = Controller()
+        self.controller = controller
         self.secondary_view = SecondaryView(self.controller)
-        self.coordinate_converter = CoordinateConverter()
 
         self.create_widget()
-        self.controller.set_views(self, self.secondary_view)
+        #self.controller.set_views(self, self.secondary_view)
 
 
 
@@ -45,8 +45,8 @@ class MainView(ctk.CTk):
         self.frame_top.pack(side='top', fill='x')
 
         self.title_label = ctk.CTkLabel(self.frame_top,
-                                       text="World Map",
-                                       font=ctk.CTkFont(family="times",
+                                       text="The Sea Level Across the Years",
+                                       font=ctk.CTkFont(family=self.font,
                                                         size=18,
                                                         weight="bold"
                                                         )
@@ -65,20 +65,26 @@ class MainView(ctk.CTk):
 
         # Year (label)
         self.year_label = ctk.CTkLabel(self.frame_bottom_left,
-                                       text="Please select a year:"
+                                       text="Please select a year:",
+                                       font=ctk.CTkFont(family=self.font,
+                                                        size=self.police,
+                                                        )
                                        )
         self.year_label.grid(row=0, column=0, columnspan=2)
 
         # Year value display (label)
         self.year_value_label = ctk.CTkLabel(self.frame_bottom_left,
-                                             text=str(self.rounded_year)
+                                             text=str(self.rounded_year),
+                                             font=ctk.CTkFont(family=self.font,
+                                                              size=self.police,
+                                                              )
                                              )
         self.year_value_label.grid(row=1, column=0, columnspan=2)
 
         # Year slider (scale)
         self.year_scale = ctk.CTkSlider(self.frame_bottom_left,
-                                        from_=1950, to=2500,
-                                        number_of_steps=(2500-1950)//5, #The evolution of the map and the associated sea level can only be seen for every 5 years (i.e, for 2020, 2025, 2030...)
+                                        from_=1950, to=3000,
+                                        number_of_steps=(3000-1950)//5, #The evolution of the map and the associated sea level can only be seen for every 5 years (i.e, for 2020, 2025, 2030...)
                                         command=self.on_scale_change,
                                         width=200
                                         )
@@ -89,24 +95,42 @@ class MainView(ctk.CTk):
         # Plus/minus (button)
         self.decrease_button = ctk.CTkButton(self.frame_bottom_left,
                                              text="-5",
+                                             font=ctk.CTkFont(family=self.font,
+                                                              size=self.police,
+                                                              ),
+                                             fg_color=self.bc,
+                                             hover_color=self.hbc,
+                                             width=50,
                                              command=self.decrease_scale
                                              )
         self.decrease_button.grid(row=3, column=0, pady=5)
 
         self.increase_button = ctk.CTkButton(self.frame_bottom_left,
                                              text="+5",
+                                             font=ctk.CTkFont(family=self.font,
+                                                              size=self.police,
+                                                              ),
+                                             fg_color=self.bc,
+                                             hover_color=self.hbc,
+                                             width=50,
                                              command=self.increase_scale
                                              )
         self.increase_button.grid(row=3, column=1, pady=5)
 
     # Sea level
         self.sea_level_title = ctk.CTkLabel(self.frame_bottom_left,
-                                            text="Sea level:"
+                                            text="Sea level:",
+                                            font=ctk.CTkFont(family=self.font,
+                                                             size=self.police,
+                                                             ),
                                             )
         self.sea_level_title.grid(row=1, column=3, padx=5)
 
         self.sea_level_label = ctk.CTkLabel(self.frame_bottom_left,
-                                            text="0.254 m"
+                                            text="0.254 m",
+                                            font=ctk.CTkFont(family=self.font,
+                                                             size=self.police,
+                                                             ),
                                             )
         self.sea_level_label.grid(row=2, column=3, padx=5)
 
@@ -120,7 +144,10 @@ class MainView(ctk.CTk):
 
         # IPCC (label)
         self.ipcc_label = ctk.CTkLabel(self.frame_bottom_center,
-                                       text="Choose your IPCC Scenario:"
+                                       text="Choose your IPCC Scenario:",
+                                       font=ctk.CTkFont(family=self.font,
+                                                        size=self.police,
+                                                        ),
                                        )
         #self.ipcc_label.grid(row=0, column=0)
         self.ipcc_label.pack(pady=10)
@@ -131,6 +158,9 @@ class MainView(ctk.CTk):
         for i, (text, value) in enumerate(values.items()):
             rb = ctk.CTkRadioButton(self.frame_bottom_center,
                                     text=text,
+                                    font=ctk.CTkFont(family=self.font,
+                                                     size=self.police,
+                                                     ),
                                     variable=self.ipcc_choice_var,
                                     value=value)
             rb.pack(pady=5)
@@ -146,6 +176,11 @@ class MainView(ctk.CTk):
     # Generate map (button)
         self.generate_button = ctk.CTkButton(self.frame_bottom_right,
                                              text="Generate map",
+                                             font=ctk.CTkFont(family=self.font,
+                                                              size=self.police,
+                                                              ),
+                                             fg_color=self.bc,
+                                             hover_color=self.hbc,
                                              command=self.show_map
                                              )
         self.generate_button.pack(pady=25)
@@ -153,6 +188,11 @@ class MainView(ctk.CTk):
     # Show Refugees (button)
         self.generate_refugees = ctk.CTkButton(self.frame_bottom_right,
                                                text="Show refugees",
+                                               font=ctk.CTkFont(family=self.font,
+                                                                size=self.police,
+                                                                ),
+                                               fg_color=self.bc,
+                                               hover_color=self.hbc,
                                                command=self.count_refugees
                                                )
         self.generate_refugees.pack(pady=5)
@@ -160,36 +200,54 @@ class MainView(ctk.CTk):
     #Show refugees (label)
 
         self.show_refugees = ctk.CTkLabel(self.frame_bottom_right,
-                                          text="")
+                                          text="",
+                                          font=ctk.CTkFont(family=self.font,
+                                                           size=self.police,
+                                                           ),
+                                          )
         self.show_refugees.pack()
 
     # Initialize sea level label
         self.on_scale_change(self.rounded_year)
 #### ------------------------- Right Side Frame -------------------------- ####
-        self.frame_right = ctk.CTkFrame(self, width=300, fg_color=self.rfc)
+        self.frame_right = ctk.CTkFrame(self, width=300, fg_color=self.bfc)
         self.frame_right.pack(side='right', anchor='n', fill='y')
 
         self.view_mode_label = ctk.CTkLabel(self.frame_right,
                                             text="Current View Mode:",
-                                            font= ctk.CTkFont(size=self.police)
+                                            font=ctk.CTkFont(family=self.font,
+                                                             size=self.police,
+                                                             ),
                                             )
         self.view_mode_label.pack(pady=5)
 
         self.view_mode_value = ctk.CTkLabel(self.frame_right,
-                                            text='None',
-                                            font= ctk.CTkFont(size=self.police)
+                                            text='Nothing generated',
+                                            font=ctk.CTkFont(family=self.font,
+                                                             size=self.police,
+                                                             weight="bold"),
+                                            fg_color=self.ffc,
+                                            width=100
                                             )
-        self.view_mode_value.pack(pady=5)
+        self.view_mode_value.pack()
 
         self.view_mode_exp = ctk.CTkLabel(self.frame_right,
                                           text="",
-                                          font= ctk.CTkFont(size=self.police)
+                                          font=ctk.CTkFont(family=self.font,
+                                                           size=self.police,
+                                                           )
                                           )
         self.view_mode_exp.pack(pady=10)
 
 
         self.exit_profile_button = ctk.CTkButton(self.frame_right,
+                                                 fg_color=self.bfc,
+                                                 hover_color=self.bfc,
                                                  text="",
+                                                 font=ctk.CTkFont(family=self.font,
+                                                                  size=self.police,
+                                                                  ),
+                                                 command=self.exit_profile_view,
                                                  )
         self.exit_profile_button.pack(pady=20)
 
@@ -203,13 +261,20 @@ class MainView(ctk.CTk):
         self.frame_map.pack_propagate(False)
 
         self.placeholder_label = ctk.CTkLabel(self.frame_map,
-                                              text="You have not loaded a map yet",
-                                              text_color="white"
+                                              text="You have not loaded a map yet.\n \n Side note: Please be patient during the generation process as there is a lot of data to load, we are currently working on the optimisation.\n  \n Once you have loaded the map in the top view, you can click on a country to get the profile view. \n Note: This feature currently works only for France, we apologise for any inconvenience.",
+                                              text_color="white",
+                                              font=ctk.CTkFont(family=self.font,
+                                                               size=self.police,
+                                                               ),
                                               )
         self.placeholder_label.pack(expand=True)
         self.loading_label = ctk.CTkLabel(self.frame_map,
                                           text="Map is loading...",
-                                          text_color="white")
+                                          text_color="white",
+                                          font=ctk.CTkFont(family=self.font,
+                                                           size=self.police,
+                                                           ),
+                                          )
 
 
 #-----------------------------------------------------------------------------#
@@ -237,7 +302,7 @@ class MainView(ctk.CTk):
 
     def increase_scale(self):
         """
-        Increases the maximum year that can be choosen with the scale by the user.
+        Increases the year on the scale by 5.
 
         Returns
         -------
@@ -245,13 +310,13 @@ class MainView(ctk.CTk):
 
         """
         val = self.year_scale.get()
-        new_val = min(2500, val + 5)
+        new_val = min(3000, val + 5)
         self.year_scale.set(new_val)
         self.on_scale_change(new_val)
 
     def decrease_scale(self):
         """
-        Decreases the minimum year that can be choosen with the scale by the user.
+        Decreases the year on the scale by 5.
 
         Returns
         -------
@@ -318,24 +383,41 @@ class MainView(ctk.CTk):
         None.
 
         """
-        # self.map_canvas = tk.Canvas(self.frame_map, bg="white", highlightthickness=0)
-        # self.map_canvas.place(relx=0, rely=0, relwidth=1, relheight=1)
 
         self.controller.top_or_side()
 
         self.loading_label.place_forget()
 
     def count_refugees(self):
-        amount = self.controller.nb_refugees
-        self.show_refugees.configure(text=f"{amount}")
+        amount = int(self.controller.count_refugees())
+        if 2021 < self.year_scale.get() < 2025:
+            self.show_refugees.configure(text=f"In {self.year_scale.get()}, there were {amount} climatic refugees.")
+        elif self.year_scale.get() == 2025:
+            self.show_refugees.configure(text=f"In {self.year_scale.get()}, there are {amount} climatic refugees.")
+        elif 2025 < self.year_scale.get() < 2523:
+            self.show_refugees.configure(text=f"In {self.year_scale.get()}, there will be {amount} climatic refugees.")
+        else:
+            self.show_refugees.configure(text="We cannot tell how many climatic refugees there are.\n Please select a year between 2022 and 2525.")
 
     def change_mode_value(self, value):
         self.view_mode_value.configure(text=f"{value}")
         if value == "profile":
-            self.exit_profile_button.configure(text="Exit profile view")
+            self.exit_profile_button.configure(fg_color=self.bc,
+                                               hover_color=self.hbc,
+                                               text="Exit profile view")
             self.view_mode_exp.configure(text="In the profile view,\nimagine that you\nare standing on\nEngland and\nlooking at France")
+            self.title_label.configure(text="Profile View of France")
+        elif value == "top":
+            self.exit_profile_button.configure(fg_color=self.bfc,
+                                               hover_color=self.bfc,
+                                               text="")
+            self.view_mode_exp.configure(text="")
+            self.title_label.configure(text="The Sea Level Across the Years")
+            
+    def exit_profile_view(self):
+        self.controller.side = "top"
+        self.controller.top_or_side()
 
-if __name__ == "__main__":
-    #ctk.set_appearance_mode("light")
-    app = MainView()
-    app.mainloop()
+# if __name__ == "__main__":
+#     app = MainView()
+#     app.mainloop()
