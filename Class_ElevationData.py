@@ -1,6 +1,7 @@
 import netCDF4 as nc
 from shapely.geometry import Polygon, Point, MultiPoint
 import pandas as pd
+from math import cos, radians
 
 class ElevationData:
 
@@ -28,9 +29,8 @@ class ElevationData:
         Load the data from several nc files containing the elevation, longitude and altitude of all points on Earth (with a precision to the 15 arc-minute). Convert the data to create a dictionary with the key being an elevation and the value a list of tuples (latitude, longitude), in degrees, of all points being at the given elevation (in meters).
 
         elevation_dico = { “elevation1” : [ [lat1, long1], [lat2, long2], …],
-                          evation2” : [ [lat1, long1], [lat2, long2], …],
-                          ,
-                          }
+                          evation2” : [ [lat1, long1], [lat2, long2], …],...}
+                          
         Parameters: 
             -------
             files_name: list of strings 
@@ -192,7 +192,7 @@ class ElevationData:
         base_density = {'asia': 149.7,'africa': 47.2,'america': 33.7,'europe': 109.0,'oceania': 5.2}
 
         # Annual population growth rates per continent 
-        growth_rate = {'asia': 0.005,'africa': 0.025,'america': 0.007,'europe': 0.000, 'oceania': 0.012}
+        growth_rate = {'asia': 0.006,'africa': 0.025,'america': 0.007,'europe': 0.003, 'oceania': 0.012}
 
         # Calculate how many years have passed since 2022 (no negative years)
         years_since_2022 = max(0, year - 2022)
@@ -227,7 +227,10 @@ class ElevationData:
     
         limits_oceania = [[110.0, 0.0], [180.0, 0.0], [180.0, -50.0], [110.0, -50.0], [110.0, 0.0]]
         polygon_oceania = MultiPoint(limits_oceania).convex_hull
-    
+        
+        # Approximate surface affected by one point 
+        surface = 5 * one_deg_lat * 5 * one_deg_long
+        
         if year > 2022:  # Check if the user chose a year in the future
             for elev, list_points in self.elevation_dict.items():
     
@@ -235,9 +238,6 @@ class ElevationData:
                 if elev < elevation_year and elev >= elevation_2022:
                     for coord in list_points: 
                         point = Point(coord[1], coord[0])  # Create a point with longitude first (x), then latitude (y)
-                        
-                        # Approximate surface affected by one point (flat Earth assumption for simplicity)
-                        surface = one_deg_lat * one_deg_long
                         
                         # Check which continent the point belongs to and compute number of refugees
                         if polygon_asia.contains(point):
@@ -262,9 +262,12 @@ class ElevationData:
             other_refugees = self.estimate_other_climatic_refugees(year)
             nb_refugees += other_refugees
         
-        if nb_refugees > 1000000:
+        if nb_refugees > 1000000000:
+            nb_refugees = round(nb_refugees / 1000000000, 3)
+            refugees = f'{nb_refugees} billion'
             
-            nb_refugees = nb_refugees // 1000000
+        elif nb_refugees > 1000000:
+            nb_refugees = round(nb_refugees / 1000000, 3)
             refugees = f'{nb_refugees} million'
             
         return refugees  # Return the total number of estimated refugees
@@ -290,13 +293,13 @@ class ElevationData:
         years_passed = max(0, min(500, year - 2022))
     
         # compute the value of each climate feature based on its base value and the annual growth
-        drought = round(self.climate_features.get('drought_index', 0) + 0.01 * years_passed, 2)  # increase drought index
-        flood = round(self.climate_features.get('flood_risk', 0) + 0.015 * years_passed, 2)      # increase flood risk
+        drought = round(self.climate_features.get('drought_index', 0) + 0.0175 * years_passed, 2)  # increase drought index
+        flood = round(self.climate_features.get('flood_risk', 0) + 0.017 * years_passed, 2)      # increase flood risk
         heat = int(self.climate_features.get('heatwave_days', 0) + 0.8 * years_passed)           # increase number of heatwave days
-        wildfire = round(self.climate_features.get('wildfire_risk', 0) + 0.012 * years_passed, 2)  # increase wildfire risk
+        wildfire = round(self.climate_features.get('wildfire_risk', 0) + 0.0175 * years_passed, 2)  # increase wildfire risk
     
         # estimate the number of refugees caused by each event
-        refugees = (drought * 50000) + (flood * 100000) + (heat * 20000) + (wildfire * 75000)
+        refugees = (drought * 10000000) + (flood * 35000000) + (heat * 2000000) + (wildfire * 3000000)
     
         # return the total number of additional climatic refugees due to these events
         return int(refugees)
