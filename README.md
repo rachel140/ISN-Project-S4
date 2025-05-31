@@ -8,4 +8,4 @@ If you **click on France**, a **profile view** of the country will appear. This 
 
 To return to the main map, simply click the **"Quit"** button.
 
-When you click on **"show refugees"**, and the selected year is later than 2022, the interface will calculate and display the **number of climate refugees arounf the world**. This is determined by multiplying the average population density of each continent by the land area that has submerged underwater.
+When you click on **"show refugees"**, and the selected year is later than 2022, the code will calculate and the interface will display the **number of climate refugees arounf the world**. This number represents both the refugees due to sea level rise and other climatic events (heatwaves, drough, floods, ...). This is determined by multiplying the average population density of each continent by the land area that has submerged underwater.
