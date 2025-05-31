@@ -36,6 +36,14 @@ class MainView(ctk.CTk):
 
 
     def create_widget(self):
+        """
+        Creates and place the widgets of the main interface (around the map).
+
+        Returns
+        -------
+        None.
+
+        """
 #-----------------------------------------------------------------------------#
 #### ------------------------------- Frames ------------------------------ ####
 #-----------------------------------------------------------------------------#
@@ -376,7 +384,7 @@ class MainView(ctk.CTk):
 
     def generate_map_canvas(self):
         """
-        Create the map.
+        Create the map of the Earth from the top or side view depending on the user's choice of diplay.
 
         Returns
         -------
@@ -389,17 +397,39 @@ class MainView(ctk.CTk):
         self.loading_label.place_forget()
 
     def count_refugees(self):
-        amount = int(self.controller.count_refugees())
+        """
+        Retreive the number of climatic refugees computed in the controller and display an adapted message
+        in the text zone dedicated on the interface n clicking on the button generate_refugees.
+
+        Returns
+        -------
+        None.
+
+        """
+        amount = self.controller.count_refugees()
         if 2021 < self.year_scale.get() < 2025:
-            self.show_refugees.configure(text=f"In {self.year_scale.get()}, there were {amount} climatic refugees.")
+            self.show_refugees.configure(text=f"In {int(self.year_scale.get())}, there were {amount} climatic refugees.")
         elif self.year_scale.get() == 2025:
-            self.show_refugees.configure(text=f"In {self.year_scale.get()}, there are {amount} climatic refugees.")
+            self.show_refugees.configure(text=f"In {int(self.year_scale.get())}, there are {amount} climatic refugees.")
         elif 2025 < self.year_scale.get() < 2523:
-            self.show_refugees.configure(text=f"In {self.year_scale.get()}, there will be {amount} climatic refugees.")
+            self.show_refugees.configure(text=f"In {int(self.year_scale.get())}, there will be {amount} climatic refugees.")
         else:
             self.show_refugees.configure(text="We cannot tell how many climatic refugees there are.\n Please select a year between 2022 and 2525.")
 
     def change_mode_value(self, value):
+        """
+        Change the value the exit button and mode text depending on whether the user displays the top or profile view.
+
+        Parameters
+        ----------
+        value : string
+            mode of display, 'top' if we see the whole map of the Earth, 'profile' for the profile view of a country.
+
+        Returns
+        -------
+        None.
+
+        """
         self.view_mode_value.configure(text=f"{value}")
         if value == "profile":
             self.exit_profile_button.configure(fg_color=self.bc,
@@ -415,9 +445,15 @@ class MainView(ctk.CTk):
             self.title_label.configure(text="The Sea Level Across the Years")
             
     def exit_profile_view(self):
+        """
+        Allow to exit the profile view after having displayed the profile view of a country when clicking on the button exit_profile_button.
+
+        Returns
+        -------
+        None.
+
+        """
         self.controller.side = "top"
         self.controller.top_or_side()
 
-# if __name__ == "__main__":
-#     app = MainView()
-#     app.mainloop()
+
