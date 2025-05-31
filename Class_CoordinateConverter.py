@@ -3,6 +3,41 @@ class CoordinateConverter:
         pass
 
     def canvas_to_geo(self, x, y, canvas, base_image, lats, lons, pan_x, pan_y, zoom, lat_indices, lon_indices):
+        """
+        Converts coordinates (x, y) of a point on the canva with the map of the Earth into real coordinates on Earth (latitude, longitude).
+
+        Parameters
+        ----------        
+        x : float
+            X coordinate on the canvas.
+        y : float
+            Y coordinate on the canvas.
+        canvas: canva
+            canva containing the image of the Earth (base_image)
+        base_image : PIL image 
+            image generated using the .nc file with all points on Earth
+        lats : numpy arrays
+            array of the latitudes, from the .nc file 
+        lons : numpy arrays
+            array of the longitudes, from the .nc file 
+        pan_x : float
+            Horizontal pan offset for image drawing
+        pan_y : float
+            Vertical pan offset for image drawing
+        zoom : float
+            Zoom scale factor (1.0 = no zoom)
+        lat_indices : numpy linspace
+            array with regulalry spaced values of the latitudes            
+        lon_indices : numpy arrays
+            array with regulalry spaced values of the longitudes        
+        
+        Returns
+        -------
+        lat : float
+            Latitude of a point on Earth.
+        lon : float
+            Longitude of a point on Earth.
+        """
         # Step 1: Convert canvas (display) coordinates to image pixel coordinates
         image_x = int((x - pan_x) / zoom)
         image_y = int((y - pan_y) / zoom)
