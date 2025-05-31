@@ -184,8 +184,18 @@ class SecondaryView:
     
         # Redraw the image with new zoom and pan
         self.redraw()
+#-----------------------------------------------------------------------------#
 
     def on_click(self, event):
+        """
+        Handle mouse click event on the map canvas.
+    
+        Converts the clicked canvas coordinates into image (pixel) coordinates, 
+        taking into account the zoom on the interface and pan. Stores the result 
+        as self.x and self.y.
+        Then notifies the controller to trigger a generation of the profile view.
+    
+        """
         # Convert click position to image coordinates
         self.x = int((event.x - self.pan_x) / self.zoom)
         self.y = int((event.y - self.pan_y) / self.zoom) 
