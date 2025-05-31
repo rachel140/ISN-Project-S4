@@ -120,7 +120,7 @@ def estimate_other_climatic_refugees(year):
     wildfire = round(climate_features.get('wildfire_risk', 0) + 0.012 * years_passed, 2)  # increase wildfire risk
 
     # estimate the number of refugees caused by each event
-    refugees = (drought * 50000) + (flood * 100000) + (heat * 20000) + (wildfire * 75000)
+    refugees = (drought * 1000000) + (flood * 25000000) + (heat * 200000) + (wildfire * 3000000)
 
     # return the total number of additional climatic refugees due to these events
     return int(refugees)
