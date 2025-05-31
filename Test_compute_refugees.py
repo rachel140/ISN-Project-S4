@@ -134,9 +134,9 @@ def test_refugees_all_asia():
     points = [[40, 100], [45, 110], [35, 120]]  # Coordinates within Asia
     result = compute_refugees(points, year=2035, elevation_year=1.5, elevation_2022=0.21)
     if result > 32000000:
-        print("test_refugees_all_asia PASSED")  # Expect increase due to the added exposure in Asia
+        print("test_refugees_all_asia passed")  # Expect increase due to the added exposure in Asia
     else:
-        print("test_refugees_all_asia FAILED")
+        print("test_refugees_all_asia failed")
 
 def test_refugees_all_ocean():
     """
@@ -147,9 +147,9 @@ def test_refugees_all_ocean():
     result = compute_refugees(points, year=2035, elevation_year=1.5, elevation_2022=0.21)
     base = compute_refugees([], year=2035, elevation_year=1.5, elevation_2022=0.21)
     if result == base:
-        print("test_refugees_all_ocean PASSED")  # Expect no change compared to an empty input
+        print("test_refugees_all_ocean passed")  # Expect no change compared to an empty input
     else:
-        print("test_refugees_all_ocean FAILED")
+        print("test_refugees_all_ocean failed")
 
 def test_refugees_multiple_continents():
     """
@@ -159,9 +159,9 @@ def test_refugees_multiple_continents():
     points = [[40, 100], [0, 20], [50, -10], [-10, 140]]  # Asia, Africa, Europe, Oceania
     result = compute_refugees(points, year=2040, elevation_year=1.8, elevation_2022=0.21)
     if result > 32000000:
-        print("test_refugees_multiple_continents PASSED")  # Expect increased estimate
+        print("test_refugees_multiple_continents passed")  # Expect increased estimate
     else:
-        print("test_refugees_multiple_continents FAILED")
+        print("test_refugees_multiple_continents failed")
 
 def test_no_points_base_case():
     """
@@ -170,9 +170,9 @@ def test_no_points_base_case():
     """
     result = compute_refugees([], year=2022, elevation_year=0.21, elevation_2022=0.21)
     if result == 32000000:
-        print("test_no_points_base_case PASSED")  # Baseline test with no exposure
+        print("test_no_points_base_case passed")  # Baseline test with no exposure
     else:
-        print("test_no_points_base_case FAILED")
+        print("test_no_points_base_case failed")
 
 def test_max_year():
     """
@@ -182,9 +182,9 @@ def test_max_year():
     result_500 = compute_refugees([], year=2522, elevation_year=10.0, elevation_2022=0.21)
     result_1000 = compute_refugees([], year=3022, elevation_year=15.0, elevation_2022=0.21)
     if result_500 == result_1000:
-        print("test_max_year PASSED")  # Year limit successfully enforced
+        print("test_max_year passed")  # Year limit successfully enforced
     else:
-        print("test_max_year FAILED")
+        print("test_max_year failed")
 
 def test_climatic_refugees_estimation():
     """
@@ -204,9 +204,9 @@ def test_climatic_refugees_estimation():
     )
 
     if result == int(expected):
-        print("test_climatic_refugees_estimation PASSED")  # Match expected output
+        print("test_climatic_refugees_estimation passed")  # Match expected output
     else:
-        print("test_climatic_refugees_estimation FAILED")
+        print("test_climatic_refugees_estimation failed")
 
 def test_refugees_increasing_with_area():
     """
@@ -217,9 +217,9 @@ def test_refugees_increasing_with_area():
     result_small = compute_refugees([point], year=2035, elevation_year=1.5, elevation_2022=0.21)
     result_large = compute_refugees([point] * 10, year=2035, elevation_year=1.5, elevation_2022=0.21)
     if result_large > result_small:
-        print("test_refugees_increasing_with_area PASSED")  # More area should imply more refugees
+        print("test_refugees_increasing_with_area passed")  # More area should imply more refugees
     else:
-        print("test_refugees_increasing_with_area FAILED")
+        print("test_refugees_increasing_with_area failed")
 
     
 
