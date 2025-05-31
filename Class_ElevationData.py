@@ -261,8 +261,13 @@ class ElevationData:
                             
             other_refugees = self.estimate_other_climatic_refugees(year)
             nb_refugees += other_refugees
-    
-        return int(nb_refugees)  # Return the total number of estimated refugees
+        
+        if nb_refugees > 1000000:
+            
+            nb_refugees = nb_refugees // 1000000
+            refugees = f'{nb_refugees} million'
+            
+        return refugees  # Return the total number of estimated refugees
     
 
                     
@@ -299,7 +304,7 @@ class ElevationData:
                             
                             
     ##____Old version to color the map of the world according to the sea level using dictionary_____                        
-    # def draw_map(self, canvas, width, height):
+    # def color_map(self, canvas, width, height):
     #     """
     #     Color the  map based on the sea level. 
     #     If the elevation is greater than the water level, then the colour is green.
