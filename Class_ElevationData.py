@@ -4,10 +4,11 @@ import pandas as pd
 
 class ElevationData:
 
-    def __init__(self, world_map, contour_map):
+    def __init__(self, world_map, country_map, contour_map,):
 
        self.netcdf_files  = world_map
        self.contour_map = contour_map
+       self.country_map = country_map
        
        self.elevation_dict = {} # Initialize an empty dictionary: { elevation → [[lat, lon], ...] }
        self.polygon = None
@@ -136,7 +137,7 @@ class ElevationData:
 
                 
             
-    def build_dico_per_long(sea_level, csv_file):
+    def build_dico_per_long(self, sea_level):
         """
         Reads a CSV file of France mainland elevation points and creates a dictionary
         where each key is a longitude (rounded to 1 decimal) and the value is the average
@@ -153,14 +154,13 @@ class ElevationData:
             Dictionary of the form {longitude_rounded : avg_elevation_above_sea_level}
             Only includes longitudes where the average elevation is above the sea level.
         """
-        csv_file = 'fr_mainland_only.csv'
-        coordinates = pd.read_csv(csv_file, encoding='utf-8', delimiter=",")
+        coordinates = pd.read_csv(self.country_map, encoding='utf-8', delimiter=",")
 
         # round longitude to 1 decimal place
-        coordinates['Longitude'] = coordinates['Longitude'].round(1)
+        coordinates['longitude'] = coordinates['longitude'].round(1)
 
         # compute average elevation per longitude
-        grouped = coordinates.groupby('Longitude')['Elevation'].mean()
+        grouped = coordinates.groupby('longitude')['elevation'].mean()
 
         # filter based on the sea level
         dico_per_long = {}
