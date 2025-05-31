@@ -29,7 +29,7 @@ class Controller:
 
         #information for maps:
         self.side = "top"       
-        self.reference_elevation = 0.21 #can only calculate refugees starting in 2022 (had elevation of 0.22m at that time)
+        self.reference_elevation = 0.21 #can only calculate refugees starting in 2022 (had elevation of 0.21m at that time)
 
     def set_views(self, mainview, secondaryview):
         self.main_view = mainview
