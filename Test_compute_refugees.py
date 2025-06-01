@@ -114,10 +114,10 @@ def estimate_other_climatic_refugees(year):
     years_passed = max(0, min(500, year - 2022))
 
     # compute the value of each climate feature based on its base value and the annual growth
-    drought = round(self.climate_features.get('drought_index', 0) + 0.0175 * years_passed, 2)  # increase drought index
-    flood = round(self.climate_features.get('flood_risk', 0) + 0.017 * years_passed, 2)      # increase flood risk
-    heat = int(self.climate_features.get('heatwave_days', 0) + 0.8 * years_passed)           # increase number of heatwave days
-    wildfire = round(self.climate_features.get('wildfire_risk', 0) + 0.0175 * years_passed, 2)  # increase wildfire risk
+    drought = round(climate_features.get('drought_index', 0) + 0.0175 * years_passed, 2)  # increase drought index
+    flood = round(climate_features.get('flood_risk', 0) + 0.017 * years_passed, 2)      # increase flood risk
+    heat = int(climate_features.get('heatwave_days', 0) + 0.8 * years_passed)           # increase number of heatwave days
+    wildfire = round(climate_features.get('wildfire_risk', 0) + 0.0175 * years_passed, 2)  # increase wildfire risk
 
     # estimate the number of refugees caused by each event
     refugees = (drought * 10000000) + (flood * 35000000) + (heat * 2000000) + (wildfire * 3000000)
