@@ -1,7 +1,6 @@
 import netCDF4 as nc
 from shapely.geometry import Polygon, Point, MultiPoint
 import pandas as pd
-from math import cos, radians
 
 class ElevationData:
 
