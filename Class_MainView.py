@@ -13,12 +13,12 @@ class MainView(ctk.CTk):
 
         # parameters
         current_year = datetime.datetime.now().year
-        self.rounded_year = min(3000, max(2000, 5 * round(current_year / 5)))
+        self.rounded_year = min(2445, max(2000, 5 * round(current_year / 5)))
         self.configure(fg_color="midnight blue")
         self.tfc = "white"                # top frame colour
         self.cfc = "midnightblue"         # center frame colour
         self.bfc = "lightblue"            # bottom and right frame colour
-        self.ffc = "azure"               # foreground frame colour
+        self.ffc = "azure"                # foreground frame colour
         
         self.bc = "steelblue"
         self.hbc = "dodgerblue"
@@ -91,8 +91,8 @@ class MainView(ctk.CTk):
 
         # Year slider (scale)
         self.year_scale = ctk.CTkSlider(self.frame_bottom_left,
-                                        from_=1950, to=3000,
-                                        number_of_steps=(3000-1950)//5, #The evolution of the map and the associated sea level can only be seen for every 5 years (i.e, for 2020, 2025, 2030...)
+                                        from_=1950, to=2445,
+                                        number_of_steps=(2445-1950)//5, #The evolution of the map and the associated sea level can only be seen for every 5 years (i.e, for 2020, 2025, 2030...)
                                         command=self.on_scale_change,
                                         width=200
                                         )
@@ -318,7 +318,7 @@ class MainView(ctk.CTk):
 
         """
         val = self.year_scale.get()
-        new_val = min(3000, val + 5)
+        new_val = min(2445, val + 5)
         self.year_scale.set(new_val)
         self.on_scale_change(new_val)
 
