@@ -22,17 +22,21 @@ We wrote the following prompt: *"I have a .nc file with a 60 arc minutes resolut
 The answer of AI was that creating a dictionary to color the map was not optimal and it was not adapted to send thousands of points to the Tkinter canvas one after the other. Since we have a .nc file with all the coordinates, it is better to use arrays to associate each coordinate with a color, then create the image and send the obtained image all at once to the Tkinter canvas. The function **generate_base_image** in our final code thus uses the function written by AI, which we adapted in order for it to work within our class **SecondaryView**.
 
 
-AI was also used to create the functions on_zoom in the class SecondaryView.
+## 1.2 On_zoom
+AI was also used to create the functions **on_zoom** in the class SecondaryView.
 It is used to allow zooming (or unzooming) on the map when scrolling with the mouse. We didn't know how to write this code, so we asked AI.
 
 We wrote the following prompt:
 *"Can you provide a function allowing to zoom on the map of the Earth (created by the function generate_base_image), where the mouse cursor is placed and unzoom, using the scroll of the mouse?"*
 
+# 2. Class ProfileView
 Finally, we had to do the class Profileview. This class shows the elevation of a country from the side. At first, we had a simple code that drew a line of the average elevation and added a blue rectangle to represent the sea, this was loaded onto a canvas (you can find the original code in the script under the name draw_profile). The problem that we had was that we wanted to overlay multiple parts, we wanted to be able to see the land as mountains and the sea in front of it but slightly transparent so that we can still see which parts became submerged. We also wanted to be able to see the elevation on the side. We were not sure how to position all of these things on a canvas. We used the prompt *" please take this code (commented code in the script of class Profile view) and modify it, we need:*
 - *everything under the land elevation should be green*
 - *we can see the elevation values on the left in a white rectangle*
 - *the sea elevation should be in blue and slightly transparent and go to the bottom until the bottom margin*
 - *to be able to put a backgroung .jpg image that starts above the sea level "*
 
-
+# 3. Class CoordinateConverter
+## 3.1 Canvas_to_geo
+We did the class by ourselves originally, unfortunatly we have lost the original code. The problem that we had with it was that *"it did not update according to the size of the image"*, after giving the original code and with the previous prompt, we got the current **canvas_to_geo**.
 
