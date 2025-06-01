@@ -171,14 +171,5 @@ class ProfileView():
         """
         Reinitialize the drawing.
 
-        Parameters
-        ----------
-        event : TYPE
-            DESCRIPTION.
-
-        Returns
-        -------
-        None.
-
         """
         self.redraw()
