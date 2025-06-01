@@ -169,7 +169,7 @@ class Controller:
                                                            lat_indices=self.secondary_view.lat_indices,
                                                            lon_indices=self.secondary_view.lon_indices
                                                            )
-        print(f"Clicked : {self.secondary_view.x} , {self.secondary_view.y} → received: {x}, {y} → geo: lat={lat:.3f}, lon={lon:.3f}")
+        print(f"[CONTROLLER] Clicked : {self.secondary_view.x} , {self.secondary_view.y} → received: {x}, {y} → geo: lat={lat:.3f}, lon={lon:.3f}")
         
         return (lat, lon)
     
