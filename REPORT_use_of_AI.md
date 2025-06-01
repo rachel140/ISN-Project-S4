@@ -1,3 +1,4 @@
+#H31. Class SecondaryView
 AI was used to improve the function **generate_base_image**.
 
 This function associates to each point on Earth a color depending on whether it is above or below the sea level value for a given year. At first, we created this function using a dictionary, in which we loaded the data from the .nc file containing the elevation, latitude, and longitude of all points on Earth.
