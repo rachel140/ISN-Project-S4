@@ -26,7 +26,11 @@ It is used to allow zooming (or unzooming) on the map when scrolling with the mo
 We wrote the following prompt:
 *"Can you provide a function allowing to zoom on the map of the Earth (created by the function generate_base_image), where the mouse cursor is placed and unzoom, using the scroll of the mouse?"*
 
-Finally, we had to do the class Profileview. This class shows the elevation of a country from the side. At first, we had a simple code that drew a line of the average elevation and added a blue rectangle to represent the sea, this was loaded onto a canvas (you can find the original code in the script under the name draw_profile. 
+Finally, we had to do the class Profileview. This class shows the elevation of a country from the side. At first, we had a simple code that drew a line of the average elevation and added a blue rectangle to represent the sea, this was loaded onto a canvas (you can find the original code in the script under the name draw_profile). The problem that we had was that we wanted to overlay multiple parts, we wanted to be able to see the land as mountains and the sea in front of it but slightly transparent so that we can still see which parts became submerged. We also wanted to be able to see the elevation on the side. We were not sure how to position all of these things on a canvas. We used the prompt *" please take this code (commented code in the script of class Profile view) and modify it, we need: 
+- everything under the land elevation should be green
+- we can see the elevation values on the left in a white rectangle
+- the sea elevation should be in blue and slightly transparent and go to the bottom until the bottom margin
+- to be able to put a backgroung .jpg image that starts above the sea level "*
 
 
 
