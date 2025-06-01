@@ -57,7 +57,48 @@ class ProfileView():
         self.redraw()
         
         self.canvas.bind("<Configure>", self.on_resize)
+        
+    # original code for that has now been replaced with redraw
+    # def draw_profile(self):
+    #     margin_x = 20       # horizontal margin (on left and right) -nb of pixels
+    #     margin_y = 20       # vertical margin (on top and bottom) -nb of pixels
+    #     space_x = 5         # horizontal space between each longitude point -nb of pixels
+    #     sea_height = 20     # height of the blue sea at the bottom -nb of pixels
 
+    #     # determine highest elevation to set canvas height
+    #     max_elev = max(self.country_per_long.values()) + self.sea_level
+
+    #     # compute canvas size
+    #     width = len(self.country_per_long) * space_x + 2 * margin_x
+    #     height = max_elev + sea_height + margin_y * 2
+
+    #     # create canvas
+    #     self.canvas = tk.Canvas(self.parent, width=width, height=height, bg="white")
+    #     self.canvas.pack()
+
+    #     # draw the sea
+    #     self.canvas.create_rectangle(0, height - sea_height, width, height, fill="blue", outline="blue")
+
+    #     # draw elevation points
+    #     points = []
+    #     for i, (longitude, elevation) in enumerate(sorted(self.country_per_long.items())):
+    #         x = margin_x + i * space_x
+    #         y = height - sea_height - elevation
+    #         points.append((x, y))
+    #         self.canvas.create_oval(x - 1, y - 1, x + 1, y + 1, fill="black")
+
+    #     # connect points with lines
+    #     for i in range(len(points) - 1):
+    #         x0, y0 = points[i]
+    #         x1, y1 = points[i + 1]
+    #         self.canvas.create_line(x0, y0, x1, y1, fill='green', width=2)
+
+    #     # draw elevation scale
+    #     scale_x = width - 10
+    #     self.canvas.create_line(scale_x, height - sea_height, scale_x, height - sea_height - max_elev, fill="black")
+    #     self.canvas.create_text(scale_x - 5, height - sea_height, text="0 m", font=("comic sans ms", 10), anchor="e")
+    #     self.canvas.create_text(scale_x - 5, height - sea_height - max_elev, text=f"{int(max_elev)} m", font=("comic sans ms", 10), anchor="e")
+   
     def load_sky_image(self):
         """
         Load a background image.
@@ -74,6 +115,7 @@ class ProfileView():
             print("Error loading blue.jpg:", e)
             self.sky_image = None #Works without image if issue with it
 
+
     def redraw(self):
         """
         Draw the profile view and adapt it to the window's size
@@ -86,7 +128,7 @@ class ProfileView():
         #Error case
         if not self.dico_per_long:
             return
-    
+#-----------------------------Made with help of AI----------------------------#
         img_width = self.canvas.winfo_width()
         img_height = self.canvas.winfo_height()
     
