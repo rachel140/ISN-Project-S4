@@ -63,7 +63,7 @@ class SecondaryView:
 
         #------------------------improved by AI-------------------------------#
         elev = elevs[lat_indices[:, None], lon_indices[None, :]]
-        print(f"[DEBUG] Elevation stats: min={np.min(elev)}, max={np.max(elev)}, mean={np.mean(elev)}")
+        print(f"[SECONDARYVIEW] Elevation stats: min={np.min(elev)}, max={np.max(elev)}, mean={np.mean(elev)}")
 
 
         # Create an empty array for the RGB image data (height, width, 3 color channels)
@@ -73,7 +73,7 @@ class SecondaryView:
         water_rgb = (25, 25, 112)
         land_rgb= (94, 200, 80) #very dark  (31, 120, 50), kinda blue (80, 200, 120) 
         below = (elev <= self.water_level)
-        print(f"[DEBUG] Number of below-sea-level points: {np.sum(below)} out of {below.size}")
+        print(f"[SECONDARYVIEW] Number of below-sea-level points: {np.sum(below)} out of {below.size}")
 
         array[below] = water_rgb
         array[~below] = land_rgb
@@ -200,7 +200,7 @@ class SecondaryView:
         self.x = int((event.x - self.pan_x) / self.zoom)
         self.y = int((event.y - self.pan_y) / self.zoom) 
         
-        print(f"Clicked at: ({self.x}, {self.y})")
+        print(f" [SECONDARYVIEW] Clicked at: ({self.x}, {self.y})")
         self.controller.create_profile_map()
         
     def create_map(self, frame, width, height, sea_level):
