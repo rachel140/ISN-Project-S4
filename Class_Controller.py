@@ -146,7 +146,7 @@ class Controller:
 
     def get_where_clicked(self):
         """
-        Retrieve the geographical coordinates (lattitude and longitude) of a point from the x and y coordinates of the window
+        Retrieve the geographical coordinates (latitude and longitude) of a point from the x and y coordinates of the window
 
         Returns
         -------
