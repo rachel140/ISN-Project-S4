@@ -193,6 +193,12 @@ class Controller:
         return self.sea_level.retrieve_sea_level(year, scenario)
     
     def run(self):
+        """
+        Runs the code to display the interface to the user.
+        Returns
+        -------
+        None
+        """
         self.main_view.mainloop()
         
 if __name__ == "__main__":
