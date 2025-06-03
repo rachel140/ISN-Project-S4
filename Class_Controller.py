@@ -78,7 +78,7 @@ class Controller:
 
     def top_or_side(self):
         """
-        Define if we want to display to profile view or the global one.
+        Define if we want to display the profile view or the global one.
 
         Returns
         -------
