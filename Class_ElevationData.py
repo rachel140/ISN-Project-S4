@@ -296,23 +296,24 @@ class ElevationData:
                     
     def estimate_other_climatic_refugees(self, year):
         """
-        Estimate number of climatic refugees due to the climatic events other than sea level rise.
+        Estimate number of climatic refugees due to the climatic events different from sea level rise.
     
         Parameters
         ----------
         year : int
-            The year chosen by the user for prediction.
+            The year chosen by the user to compute the number of climatic refugees.
     
         Returns
         -------
         refugees : int
-            Estimated number of additional climatic refugees based on the evolution of key climate features.
+            Estimated number of additional climatic refugees due to different 
+            climate features like floods, heatwaves, drought and wildfire.
         """
     
         # compute the number of years since 2022 and limit it to 500 to avoid unrealistic projections
         years_passed = max(0, min(500, year - 2022))
     
-        # compute the value of each climate feature based on its base value and the annual growth
+        # compute the value of each climate feature based on its initiale value and the annual increase
         drought = round(self.climate_features.get('drought_index', 0) + 0.0175 * years_passed, 2)  # increase drought index
         flood = round(self.climate_features.get('flood_risk', 0) + 0.017 * years_passed, 2)      # increase flood risk
         heat = int(self.climate_features.get('heatwave_days', 0) + 0.8 * years_passed)           # increase number of heatwave days
