@@ -25,19 +25,22 @@ class ElevationData:
     def create_elevation(self):
         
         """
-        Load the data from several nc files containing the elevation, longitude and altitude of all points on Earth (with a precision to the 15 arc-minute). Convert the data to create a dictionary with the key being an elevation and the value a list of tuples (latitude, longitude), in degrees, of all points being at the given elevation (in meters).
+        Load the data from a .nc file containing the elevation, longitude and altitude of all points on Earth 
+        (with a precision to the 60 arc-minute). Convert the data to create a dictionary with the key being an
+        elevation and the value a list of tuples (latitude, longitude), in degrees, of all points being at the 
+        given elevation (in meters).
 
         elevation_dico = { “elevation1” : [ [lat1, long1], [lat2, long2], …],
                           evation2” : [ [lat1, long1], [lat2, long2], …],...}
                           
         Parameters: 
             -------
-            files_name: list of strings 
-            corresponding to the name of the nc files containing the data for the latitude, longitude and elevation of all points on Earth.
+            self.netcdf_files: string
+            corresponding to the name of the .nc file containing the data for the latitude, longitude and elevation of all points on Earth.
 
         Returns:
             -------
-            elevation_dico: dict
+            elevation_dict: dict
             associates each elevation in meters to a list of tuples (latitude, longitude) in degrees at the given elevation.
         """
 
@@ -81,8 +84,8 @@ class ElevationData:
     
     def create_polygon(self, csv_file):
         """
-        Load a CSV file with coordinates and create a polygon shape from it.
-        The CSV has columns 'latitude' and 'longitude'.
+        Load a csv file with coordinates and create a polygon shape from it.
+        The csv has columns 'latitude' and 'longitude'.
         
         Parameters
         ----------
@@ -138,9 +141,9 @@ class ElevationData:
             
     def build_dico_per_long(self, sea_level):
         """
-        Reads a CSV file of France mainland elevation points and creates a dictionary
+        Reads a csv file of France mainland elevation points and creates a dictionary
         where each key is a longitude (rounded to 1 decimal) and the value is the average
-        elevation above sea level at that longitude (only if it's above sea level).
+        elevation above sea level at that longitude (only if it is above sea level).
     
         Parameters
         ----------
@@ -174,10 +177,28 @@ class ElevationData:
     def compute_refugees(self, year, elevation_year, elevation_2022):
         """
         Compute the number of climatic refugees due to the elevation of sea level.
-        Define the limits of the continents considering the points the most at north, east, south and west of each continent.
-        store these limits in lists of tuples (lat, long) in order north, east, south and west:
-            limits_continent= [(lat_max_north, long_max_north),(lat_max_east, long_max_east),(lat_max_south, long_max_south),(lat_max_west, long_max_west)]
-    
+        Define the limits of the continents considering a polygon containing the whole continent, including sea borders.
+        Store the limit coordinates in lists of tuples (lat, long) in order north, east, south and west to have a closed polygon.
+        Intialize the number of refugees known in 2022.
+        For each continent define an average population density and store it in a dictionary associating a continent name to a density.
+        Define a dictionary associating to a continent's name the annual population growth to adjust the average population density according to the year.
+        Define the surface in km squared covered by a point on the dictionary eleavtion_dict as the product of one degree in latitude and one in longitude
+        converted in kilometer time 25 since we have a 5° resolution.
+        At the year chosen by the user (limited to 500 years after 2022 to avoid unrealistic projections), compute the corresponding
+        population density for each continent.
+        If the user chose a year in the future, for each point in elevation_dict, if the point have been submerged,
+        computes the number of regugees due to sea level rise by multiplying the surface immerged by the population density of the continent.
+        To check if a point have been immerged, we check that it is below sea level in the year chosen by the user,
+        but was above sea level in 2022.
+        Then add the refugees due to other climatic events using the function estimate_other_climatic_refugees.
+        Parameters: 
+         -------
+         year : int
+             year chosen by the user on the interface, at which we want to compute the number of climatic refugees
+         elevation_year : float
+             sea level in meters in the year chosen by the user
+         elevation 2022 : float
+             sea level elevation in 2022
         Returns:
         -------
             nb_refugees: (int) number of climatic refugees according to the year chosen by the user and the scenario.
@@ -195,8 +216,8 @@ class ElevationData:
 
         # Calculate how many years have passed since 2022 (no negative years)
         years_since_2022 = max(0, year - 2022)
-        # If the user puts a year too far in the future (like 3000), we limit it to 500 years
-        # to avoid unrealistic density due to the exponential growth 
+        # If the user puts a year too far in the future, we limit it to 500 year, since models are not valid anymore after that
+        # It avoids unrealistic population densities due to the exponential growth of the population
         if year - 2022 > 500:
             years_since_2022 = 500
     
@@ -227,7 +248,7 @@ class ElevationData:
         limits_oceania = [[110.0, 0.0], [180.0, 0.0], [180.0, -50.0], [110.0, -50.0], [110.0, 0.0]]
         polygon_oceania = MultiPoint(limits_oceania).convex_hull
         
-        # Approximate surface affected by one point 
+        # Approximate surface covered by one point in the dictionary elevation_dict
         surface = 5 * one_deg_lat * 5 * one_deg_long
         
         if year > 2022:  # Check if the user chose a year in the future
