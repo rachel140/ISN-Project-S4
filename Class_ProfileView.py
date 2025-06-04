@@ -27,12 +27,17 @@ class ProfileView():
 
     def draw_profile(self, frame, width, height, dico_per_long, sea_level):
         """
-        Draw the profile view from the elevation, the coordinates and the sea level.
+        Create the profile view of a country in the main window of the interface.
+        The sea is placed at the bottom in blue, 
+        Height of the canva = sea height + maximum elevation average +1,   
+        Width of the canva = nb longitudes + 2
+        Place a point for each longitude with the associated average latitude and draw
+        lines between neighbor points to create the profile shape of the country.
 
         Parameters
         ----------
-        frame : 
-            
+        frame : canva
+            canva in which the profile view is displayed
         width : int
             Width of the profile view
         height : int
@@ -40,7 +45,7 @@ class ProfileView():
         dico_per_long : dict
             Dictionary containing the longitudes and their associated elevation
         sea_level : float
-            Sea level for the cocnerned year
+            Sea level for the concerned year
 
         Returns
         -------
@@ -101,7 +106,7 @@ class ProfileView():
    
     def load_sky_image(self):
         """
-        Load a background image.
+        Load a background image for the profile view.
 
         Returns
         -------
@@ -212,6 +217,8 @@ class ProfileView():
     def on_resize(self, event):
         """
         Reinitialize the drawing.
-
+        Returns
+        -------
+        None.
         """
         self.redraw()
