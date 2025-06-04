@@ -32,6 +32,13 @@ class Controller:
         self.reference_elevation = 0.21 #can only calculate refugees starting in 2022 (had elevation of 0.21m at that time)
 
     def set_views(self, mainview, secondaryview):
+        """
+        Initializes the main and secondary views to display to the user.
+        Returns
+        -------
+        None.
+        """
+        
         self.main_view = mainview
         self.secondary_view = secondaryview
 
