@@ -217,6 +217,7 @@ class ProfileView():
     def on_resize(self, event):
         """
         Reinitialize the drawing.
+        
         Returns
         -------
         None.
