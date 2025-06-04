@@ -63,8 +63,8 @@ class Controller:
     def sea_level_value(self):
         return self.sea_level.retrieve_sea_level(
             self.chosen_year,
-            self.main_view.get_ipcc_value()
-        )
+            self.main_view.get_ipcc_value())
+        
                                                            
 
     def count_refugees(self):
@@ -175,8 +175,8 @@ class Controller:
                                                            pan_y=self.secondary_view.pan_y,
                                                            zoom=self.secondary_view.zoom,
                                                            lat_indices=self.secondary_view.lat_indices,
-                                                           lon_indices=self.secondary_view.lon_indices
-                                                           )
+                                                           lon_indices=self.secondary_view.lon_indices)
+                                                           
         print(f"[CONTROLLER] Clicked : {self.secondary_view.x} , {self.secondary_view.y} → received: {x}, {y} → geo: lat={lat:.3f}, lon={lon:.3f}")
         
         return (lat, lon)
