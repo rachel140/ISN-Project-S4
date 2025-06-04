@@ -9,9 +9,9 @@ class CoordinateConverter:
         Parameters
         ----------        
         x : float
-            X coordinate on the canvas.
+            x coordinate on the canvas.
         y : float
-            Y coordinate on the canvas.
+            y coordinate on the canvas.
         canvas: canva
             canva containing the image of the Earth (base_image)
         base_image : PIL image 
@@ -21,15 +21,15 @@ class CoordinateConverter:
         lons : numpy arrays
             array of the longitudes, from the .nc file 
         pan_x : float
-            Horizontal pan offset for image drawing
+            Horizontal pan offset to draw the image
         pan_y : float
-            Vertical pan offset for image drawing
+            Vertical pan offset to draw the image
         zoom : float
             Zoom scale factor (1.0 = no zoom)
         lat_indices : numpy linspace
-            array with regulalry spaced values of the latitudes            
+            array with regularly spaced values of the latitudes            
         lon_indices : numpy arrays
-            array with regulalry spaced values of the longitudes        
+            array with regularly spaced values of the longitudes        
         
         Returns
         -------
