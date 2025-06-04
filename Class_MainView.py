@@ -37,7 +37,11 @@ class MainView(ctk.CTk):
 
     def create_widget(self):
         """
-        Creates and place the widgets of the main interface (around the map).
+        Creates and place the widgets of the main interface (around the map):
+        a scale to allow the user to choose a year, a button to generate the map, 
+        a label to indicate if the interface is in profile or top view, a button to exit the profile view, 
+        a button to show the number of refugees, a label displaying the number of refugees.
+        Get the information on the chosen year (scale). Get the information on chosen zoom (roll of middle mouse button). 
 
         Returns
         -------
@@ -384,7 +388,7 @@ class MainView(ctk.CTk):
 
     def generate_map_canvas(self):
         """
-        Create the map of the Earth from the top or side view depending on the user's choice of diplay.
+        Create the map of the Earth from the top or side view depending on the user's choice of display.
 
         Returns
         -------
@@ -398,7 +402,7 @@ class MainView(ctk.CTk):
 
     def count_refugees(self):
         """
-        Retreive the number of climatic refugees computed in the controller and display an adapted message
+        Retrieve the number of climatic refugees computed in the controller and display an adapted message
         in the text zone dedicated on the interface n clicking on the button generate_refugees.
 
         Returns
@@ -418,7 +422,7 @@ class MainView(ctk.CTk):
 
     def change_mode_value(self, value):
         """
-        Change the value the exit button and mode text depending on whether the user displays the top or profile view.
+        Change the value of the exit button and mode text depending on whether the user displays the top or profile view.
 
         Parameters
         ----------
