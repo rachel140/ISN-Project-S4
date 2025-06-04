@@ -179,7 +179,7 @@ class ElevationData:
         Compute the number of climatic refugees due to the elevation of sea level.
         Define the limits of the continents considering a polygon containing the whole continent, including sea borders.
         Store the limit coordinates in lists of tuples (lat, long) in order north, east, south and west to have a closed polygon.
-        Intialize the number of refugees known in 2022.
+        Initialize the number of refugees known in 2022.
         For each continent define an average population density and store it in a dictionary associating a continent name to a density.
         Define a dictionary associating to a continent's name the annual population growth to adjust the average population density according to the year.
         Define the surface in km squared covered by a point on the dictionary eleavtion_dict as the product of one degree in latitude and one in longitude
