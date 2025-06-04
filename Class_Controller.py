@@ -159,7 +159,7 @@ class Controller:
         Returns
         -------
         lat : float
-            Lattitude of the concerned point
+            Latitude of the concerned point
         lon : float
             Longitude of the concerned point
 
