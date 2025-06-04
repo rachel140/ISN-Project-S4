@@ -187,8 +187,8 @@ class ElevationData:
         At the year chosen by the user (limited to 500 years after 2022 to avoid unrealistic projections), compute the corresponding
         population density for each continent.
         If the user chose a year in the future, for each point in elevation_dict, if the point have been submerged,
-        computes the number of regugees due to sea level rise by multiplying the surface immerged by the population density of the continent.
-        To check if a point have been immerged, we check that it is below sea level in the year chosen by the user,
+        computes the number of refugees due to sea level rise by multiplying the surface submerged by the population density of the continent.
+        To check if a point have been submerged, we check that it is below sea level in the year chosen by the user,
         but was above sea level in 2022.
         Then add the refugees due to other climatic events using the function estimate_other_climatic_refugees.
         Parameters: 
