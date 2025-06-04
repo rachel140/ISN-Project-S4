@@ -23,7 +23,11 @@ class SecondaryView:
         """
         Generate the base image (PIL.Image) sized (base_width x base_height) showing land and sea colors.
         Uses elevation data from netCDF file to color pixels blue if below sea level, green if above.
-        Only regenerates if water level changed since last call.
+        Only regenerates if the water level has changed since last call.
+
+        Returns
+        -------
+        None
         """
         # If image already generated and water level hasn't changed, no need to regenerate
         if self.base_image is not None and self.water_level == sea_level:
@@ -90,6 +94,10 @@ class SecondaryView:
         Redraw the base image on the canvas, applying zoom and pan offsets.
         This method handles scaling the base image to fit current zoom and placing it
         correctly on the canvas based on pan_x and pan_y.
+        
+        Returns
+        -------
+        None.
         """
         # If no base image yet, no drawing needed
         if self.base_image is None:
@@ -124,8 +132,13 @@ class SecondaryView:
 
     def on_resize(self, event):
         """
-        Handle window resize events by recalculating pan offsets to center the zoomed image
-        within the new canvas size, then redraw.
+        Resize the window according to the zoom chosen by the user with its mouse scroll.
+        Recalculate the pan offsets to center the zoomed image within the new canvas size.
+        Then redraw the map.
+        
+        Returns
+        -------
+        None.
         """
         w, h = event.width, event.height      # New size of the canvas
         new_w = int(w * self.zoom)            # Width of the zoomed image
@@ -140,9 +153,13 @@ class SecondaryView:
 
     def on_zoom(self, event):
         """
-        Handle mouse wheel events for zooming in and out.
-        Zoom occurs centered on the mouse pointer to create intuitive zoom behavior.
-        Prevents zooming out beyond fitting the image to the canvas.
+        Allow to zoom in and out when scrolling with the mouse, 
+        centered on the point below the cursor of the mouse.        
+        Prevents zooming out too much so that the image does not fit in the canvas anymore.
+        
+        Returns
+        -------
+        None.
         """
         if self.base_image is None:
             return
@@ -188,13 +205,16 @@ class SecondaryView:
 
     def on_click(self, event):
         """
-        Handle mouse click event on the map canvas.
+        Check if the user clicked on a country for which a profile view is available.
     
         Converts the clicked canvas coordinates into image (pixel) coordinates, 
         taking into account the zoom on the interface and pan. Stores the result 
         as self.x and self.y.
         Then notifies the controller to trigger a generation of the profile view.
-    
+        
+        Returns
+        -------
+        None.
         """
         # Convert click position to image coordinates
         self.x = int((event.x - self.pan_x) / self.zoom)
@@ -205,8 +225,22 @@ class SecondaryView:
         
     def create_map(self, frame, width, height, sea_level):
         """
-        Create and set up the Tkinter canvas with the base image loaded and display it.
-        Also binds resize and zoom events for interactive control.
+        Create and set up the Ctkinter canvas with the base image loaded and display it.
+        Also binds resize and zoom events to allow the user to interact with the interface.
+        
+        Parameters
+        -------
+        frame : container of the canvas containing the map
+        width : float
+            width of the frame
+        height : float
+            height of the frame
+        sea_level : float
+            value of the sea level at the year chosen by the user
+        
+        Returns
+        -------
+        None.
         """
         print(f"[SECONDARYVIEW] Generating image with sea level: {sea_level}")
         # Generate or update the base image for the given parameters
