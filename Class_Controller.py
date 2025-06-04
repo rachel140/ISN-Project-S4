@@ -33,7 +33,7 @@ class Controller:
 
     def set_views(self, mainview, secondaryview):
         """
-        Initializes the attributs mainview and secondaryview using the parameters which are respectively 
+        Initializes the attributes mainview and secondaryview using the parameters which are respectively 
         an instance of the MainView class and an instance of the SecondaryView class.
         Returns
         -------
