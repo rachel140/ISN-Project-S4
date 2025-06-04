@@ -188,9 +188,9 @@ class Controller:
         Parameters
         ----------
         year : int
-            Year choosen by the user to visualize
+            Year chosen by the user to visualize
         scenario : int
-            GIEC scenario choosen by the user to visualize
+            GIEC scenario chosen by the user to visualize
 
         Returns
         -------
@@ -202,7 +202,7 @@ class Controller:
     
     def run(self):
         """
-        Runs the code to display the interface to the user.
+        Run the code to display the interface to the user.
         Returns
         -------
         None
