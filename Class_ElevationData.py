@@ -183,7 +183,7 @@ class ElevationData:
         For each continent define an average population density and store it in a dictionary associating a continent name to a density.
         Define a dictionary associating to a continent's name the annual population growth to adjust the average population density according to the year.
         Define the surface in km squared covered by a point on the dictionary eleavtion_dict as the product of one degree in latitude and one in longitude
-        converted in kilometer time 25 since we have a 5° resolution.
+        converted in kilometer times 25 since we have a 5° resolution.
         At the year chosen by the user (limited to 500 years after 2022 to avoid unrealistic projections), compute the corresponding
         population density for each continent.
         If the user chooses a year in the future, for each point in elevation_dict, if the point have been submerged,
