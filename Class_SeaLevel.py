@@ -35,18 +35,18 @@ class SeaLevel:
 
     def compute_sea_level_1(self, year):
         """
-        Compute the average sea level elevation for a given year (int) in the future using the model prediction from the IPCC scenario 1.
-        
+        Compute the average sea level elevation for a given year (int) in the future
+	using the model prediction from the IPCC scenario 1.        
         Parameter:
         ----------
         year: int 
-        above 2025 corresponding to a year in the future at which we want to compute the sea level according to the predictions
+        above 2025 corresponding to a year in the future at which we want to compute 
+	the sea level according to the predictions.
         Returns:
         ----------
         sea_level:  float 
         value of the average sea level elevation for the given year 
-	    """
-
+	"""
         return round(6*(10**(-82))*year**24.366,3)
     
     def compute_sea_level_2(self, year):
@@ -61,7 +61,7 @@ class SeaLevel:
         ----------
         sea_level:  float 
         value of the average sea level elevation for the given year 
-	    """
+	"""
         return round(7*(10**(-91))*year**27.078,3)
     
     def compute_sea_level_3(self, year):
@@ -76,7 +76,7 @@ class SeaLevel:
         ----------
         sea_level:  float 
         value of the average sea level elevation for the given year 
-	    """
+	"""
         return round(1*(10**(-107))*year**32.127,3)
     
     def compute_sea_level_4(self, year):
@@ -91,7 +91,7 @@ class SeaLevel:
         ----------
         sea_level:  float 
         value of the average sea level elevation for the given year 
-	    """
+	"""
         return round(3*(10**(-128))*year**38.388,3)
 
     def retrieve_sea_level(self, year, scenario):
@@ -112,7 +112,7 @@ class SeaLevel:
         ----------
         sea_level : float 
         value of the sea level elevation for the given year
-	    """
+	"""
 
         if year in self.dico_sea_level.keys():
             sea_level = self.dico_sea_level[year]
