@@ -5,7 +5,7 @@
 **To install all the necessary libraries**, write ‘`pip install *library name*`’ 
 list of libraries: customtkinter, tkinter, netCDF4, numpy, pandas, pillow, shapely, matplotlib, csv and datetime 
 *Restart the kernel*  
-**Execute the MainView class**. This will start the main user interface of the simulation.
+**Execute the MainView class**. This will start the main user interface of the simulation. The execution might take some time, 
 
 ---
 
