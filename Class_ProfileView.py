@@ -113,13 +113,14 @@ class ProfileView():
         None.
 
         """
+    #-----------------------------Made with help of AI----------------------------#
         try:
             bg = Image.open("blue.jpg").convert("RGB")
             self.sky_image = bg
         except Exception as e:
             print("[PROFILEVIEW] Error loading blue.jpg:", e)
             self.sky_image = None #Works without image if issue with it
-
+#---------------------------------------------------------------------------------#
 
     def redraw(self):
         """
