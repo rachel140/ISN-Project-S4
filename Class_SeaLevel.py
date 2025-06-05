@@ -35,7 +35,7 @@ class SeaLevel:
 
     def compute_sea_level_1(self, year):
         """
-        Compute the average sea level elevation for a given year (int) in the future using the model prediction from the GIEC scenario 1.
+        Compute the average sea level elevation for a given year (int) in the future using the model prediction from the IPCC scenario 1.
         
         Parameter:
         ----------
@@ -51,7 +51,7 @@ class SeaLevel:
     
     def compute_sea_level_2(self, year):
         """
-        Compute the average sea level elevation for a given year (int) in the future using the model prediction from the GIEC scenario 2.
+        Compute the average sea level elevation for a given year (int) in the future using the model prediction from the IPCC scenario 2.
         
         Parameter:
         ----------
@@ -66,7 +66,7 @@ class SeaLevel:
     
     def compute_sea_level_3(self, year):
         """
-        Compute the average sea level elevation for a given year (int) in the future using the model prediction from the GIEC scenario 3.
+        Compute the average sea level elevation for a given year (int) in the future using the model prediction from the IPCC scenario 3.
         
         Parameter:
         ----------
@@ -81,7 +81,7 @@ class SeaLevel:
     
     def compute_sea_level_4(self, year):
         """
-        Compute the average sea level elevation for a given year (int) in the future using the model prediction from the GIEC scenario 4.
+        Compute the average sea level elevation for a given year (int) in the future using the model prediction from the IPCC scenario 4.
         
         Parameter:
         ----------
@@ -106,7 +106,7 @@ class SeaLevel:
         	year: int 
         year at which we want to retrieve the sea level
             scenario: int
-        GIEC scenario the user chose on the interface to model the evolution of sea level rise
+        IPCC scenario the user chose on the interface to model the evolution of sea level rise
         
         Returns: 
         ----------
